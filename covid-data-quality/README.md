@@ -32,7 +32,7 @@ fairest comparison to those above):
     fully vaccinated does not require the individual to have had
     a booster shot.
 
-Some data quality issues:
+Some data quality issues which are already reported or somewhat obvious:
 - For the hospital survey data:
     - It is not needed by a hospital to report data on vaccination status (!!)
     - The definition of the `total_personnel_covid_vaccinated_doses_one_7_day`
@@ -50,8 +50,30 @@ Some data quality issues:
     - There are no guarantees as of May 2021 as to whether
     data from New Hampshire is of use
 
-Proposed data quality metrics:
-- 
+Data quality issues to consider:
+- Indicator for whether vaccination rates are reported
+    - I mean, if it's not reported, it's not exactly good data, no?
+- Non-positive number of workers
+    - If a hospital has no workers, either something is up
+    with the reporting, or there's something REALLY 
+    interesting going on.
+- Substantial changes in workers over time
+    - Sometimes the number of individuals in a particular group
+    within the same hospital changes substantially (e.g by
+    multiple orders of magnitude) over a short time period.
+- More fully vaccinated workers than "one shot or more" workers
+    - This is probably due to ambiguity in how the variable
+    is coded (the description is contradictory in its
+    intent, and what is meant to be captured by it).
+- Looking at standard deviations of not vaccinated percentages
+in a hospital away from the population percentages in a county
+    - If this is slightly negative, or **substantially** positive,
+    then this could be evidence that there is something amiss here,
+    as we would expect healthcare workers to be, if anything,
+    more likely to be vaccinated than the population they are in.
+    Significantly positive deviations would suggest a possible
+    overestimation in counts, whereas slightly negative or
+    significantly negative deviations could suggest underreporting.
 
 
 Dates we'll look at:
