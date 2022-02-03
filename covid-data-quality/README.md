@@ -2,6 +2,7 @@
 
 Files:
 - `wrangling.ipynb` wrangling of the data
+- `data-vis.ipynb` visualizations of maps
 
 Data sources:
 - [COVID-19 Reported Patient Impact and Hospital Capacity by Facility](https://healthdata.gov/Hospital/COVID-19-Reported-Patient-Impact-and-Hospital-Capa/anag-cw7u)
