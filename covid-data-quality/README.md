@@ -1,5 +1,8 @@
 # Vaccination status of healthcare workers for COVID-19
 
+Files:
+- `wrangling.ipynb` wrangling of the data
+
 Data sources:
 - [COVID-19 Reported Patient Impact and Hospital Capacity by Facility](https://healthdata.gov/Hospital/COVID-19-Reported-Patient-Impact-and-Hospital-Capa/anag-cw7u)
 - [COVID-19 Vaccinations in the United States by County](https://data.cdc.gov/Vaccinations/COVID-19-Vaccinations-in-the-United-States-County/8xkx-amqh)
