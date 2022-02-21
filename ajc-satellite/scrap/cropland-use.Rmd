@@ -1,0 +1,13 @@
+---
+title: "Types of crops in Georgia"
+output:
+  html_document:
+    toc: true
+    fig_caption: true
+---
+
+```{r setup, include = FALSE}
+install.packages('CropSpaceR')
+library(tidyverse)
+library(CropSpaceR)
+```
