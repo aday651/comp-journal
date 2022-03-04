@@ -1,0 +1,1 @@
+Google Earth layer of 2008 Tree Coverage - https://geospatial.gatech.edu/TreesAtlanta/
