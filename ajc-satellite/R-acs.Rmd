@@ -1,0 +1,123 @@
+---
+title: "ACS data on counties surrounding Atlanta"
+output:
+  html_document:
+    toc: true
+    fig_caption: true
+---
+
+```{r}
+library(tidyverse)
+library(tidycensus)
+library(lubridate)
+```
+
+```{r}
+years <- lst(2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019)
+# variables to collect:
+# population number
+# population by race
+# mediam income
+# mediam rent
+# median house prices
+# look these variables up in the detailed tables rather than the
+# data profiles!!
+acs_variables <- c(
+    #median_unit_value = "DP04_0089",
+    median_rent = "B25064_001",
+    median_rent_income_percent = "B25071_001",
+    median_household_income = "B25099_001",
+    #total_units = "DP04_0001",
+    #occupied_rental_units = "DP04_0126",
+    #occupied_owned_units = "DP04_0080",
+    total_pop = "B01003_001",
+    pop_white = "B02008_001",
+    pop_baa = "B02009_001",
+    pop_aian = "B02010_001",
+    pop_asian = "B02011_001",
+    pop_nhpi = "B02012_001",
+    pop_other_race = "B02013_001",
+    pop_foreign_born = "B05002_013"
+)
+counties_list <- c(
+    'Cherokee', 'Clayton', 'Cobb', 
+    'DeKalb', 'Douglas', 'Fayette', 
+    'Forsyth', 'Fulton', 'Gwinnett', 
+    'Henry','Rockdale'
+)
+```
+
+```{r, eval = FALSE, include = FALSE}
+v11 <- load_variables(2011, "acs1", cache = TRUE)
+v17 <- load_variables(2017, "acs1", cache = TRUE)
+View(v11)
+View(v17)
+```
+
+```{r, warning = FALSE, message = FALSE, eval = FALSE}
+df_temp <- map_dfr(
+    years,
+    ~ get_acs(
+        geography = "county",
+        state = "GA",
+        variables = acs_variables,
+        year = .x,
+        county = counties_list,
+        survey = "acs1",
+        geometry = FALSE
+    ), 
+    .id = "year")
+
+df <- df_temp %>% select(-c(moe)) %>%
+    mutate(NAME = gsub("^(.*?),.*", "\\1", NAME))
+
+write_csv(df, 'ajc-satellite/data/acs_demo.csv')
+```
+
+```{r, include = FALSE}
+df <- read_csv('ajc-satellite/data/acs_demo.csv')
+```
+
+```{r}
+df_ratio <- df %>% pivot_wider(
+    names_from = variable, names_prefix = "var_",
+    values_from = estimate
+) %>% mutate(
+    across(starts_with('var_pop'), ~ . / var_total_pop)
+)
+```
+
+```{r}
+new_names <- tibble(
+    variable = c(
+        "var_pop_white", "var_pop_baa", 
+        "var_pop_foreign_born", "var_pop_asian"
+    ),
+    demographic = c(
+        "White", "Black or African American",
+        "Foreign Born", "Asian"
+    ))
+
+df_rents <- df_ratio %>%
+    mutate(year = ymd(year, truncated = 2L)) %>%
+    select(year, NAME, var_median_rent_income_percent)
+
+df_ratio %>% 
+    mutate(year = ymd(year, truncated = 2L)) %>%
+    select(year, NAME, var_pop_white, var_pop_baa,
+    var_pop_foreign_born, var_pop_asian) %>%
+    pivot_longer(
+        cols = starts_with('var'),
+        names_to = "variable",
+        values_to = "estimate"
+    ) %>% 
+    left_join(new_names) %>%
+    ggplot(aes(x = year, y = estimate, col = demographic)) + 
+    geom_line() + facet_wrap(~ NAME) + 
+    labs(x = "Year", y = "Proportion of Population", col = "Demographic") +
+    theme(legend.position = "bottom")
+```
+
+```{r}
+
+```
