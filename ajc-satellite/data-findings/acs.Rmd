@@ -1,0 +1,342 @@
+---
+title: "ACS data on counties surrounding Atlanta"
+output:
+  html_document:
+    toc: true
+    fig_caption: true
+---
+
+```{r, include = FALSE}
+setwd("/mnt/c/Users/adavi/Documents/comp-journal/ajc-satellite/data-findings/")
+library(tidyverse)
+library(tidycensus)
+library(lubridate)
+library(zoo)
+library(sf)
+```
+
+# Geographic units and time period(s) considered
+
+Throughout, we will consider different geographic units, corresponding to
+various collections of counties, and other unified geographical areas corresponding
+to different parts of the landscape.
+
+```{r}
+core_counties <- c(
+    "Fulton", "DeKalb", "Gwinnett", "Cobb", "Clayton"
+)
+
+arc_counties <- c(
+    "Fulton", "DeKalb", "Gwinnett", "Cobb", "Clayton", "Forsyth",
+    "Cherokee", "Douglas", "Fayette", "Henry", "Rockdale"
+)
+
+atlanta_msa_1 <- c(
+    'Fulton', 'Gwinnett',
+    'Cobb', 'DeKalb', 'Clayton',
+    'Cherokee', 'Forsyth',
+    'Henry', 'Paulding', 'Coweta',
+    'Douglas', 'Fayette', 'Carroll',
+    'Newton', 'Bartow', 'Walton', 
+    'Rockdale'
+)
+
+atlanta_msa_2 <- c(
+    'Barrow', 'Spalding', 'Pickens', 
+    'Haralson', 'Dawson', 'Butts', 
+    'Meriwether', 'Morgan',
+    'Pike', 'Lamar', 'Jasper', 'Heard'
+)
+
+atlanta_msa <- c(atlanta_msa_1, atlanta_msa_2)
+```
+
+Throughout, we will frequently use ACS data; for ACS 1 year estimates, we use data
+from 2009 to 2019 (we note that [2020 data has not been released](
+    https://www.census.gov/newsroom/press-releases/2021/changes-2020-acs-1-year.html
+) as a result of the COVID pandemic adversely affecting data collection), and for
+ACS 5 year estimates, we use data from 2009 to 2020.
+
+```{r}
+years_acs1 <- lst(
+    2009, 2010, 2011, 2012, 2013, 2014,
+    2015, 2016, 2017, 2018, 2019
+)
+
+years_acs5 <- lst(
+    2009, 2010, 2011, 2012, 2013, 2014, 
+    2015, 2016, 2017, 2018, 2019, 2020
+)
+```
+
+## Defining inside and outside the perimeter
+
+Here, we will consider the I-285 ringroad as defining the "perimeter"
+of the "main" part of Atlanta, and will consider anything inside of this
+as being "inside the perimeter" (or ITP), and anything outside as
+"outside the perimeter" (or OTP). The shape file for the ringroad is available
+[online](https://opendata.atlantaregional.com/datasets/929e158242f24c9fb260606526b7d80e).
+
+```{r}
+highways <- sf::st_read("../data/georgia-highways.geojson")
+
+it_285 <- highways %>%
+    filter(str_detect(ROAD_NAME, "285")) %>%
+    select(ROAD_NAME, geometry)
+
+it_285 <- it_285[c(1, 3), ]
+itp <- st_union(st_convex_hull(it_285))
+```
+
+As is visible from the plot below, the ringroad does not necessarily
+line up nicely with the county divisions within Georgia: the perimeter
+is highlighted in red, with the regular counties highlighted in black.
+However, the census tracts (in grey) do line up more nicely with the
+perimeter, albeit not exactly. 
+
+```{r}
+arc_counties_shp <- sf::st_read("../ga-counties/Counties_Georgia.shp") %>%
+    filter(NAME10 %in% arc_counties) %>%
+    select(NAME10, COUNTYFP10, geometry)
+
+arc_tracts_shp <- sf::st_read("../ga-tracts-2020/tl_2020_13_tract.shp") %>%
+    filter(COUNTYFP %in% arc_counties_shp$COUNTYFP10)
+
+ggplot() +
+    geom_sf(data = arc_tracts_shp, colour = "grey", fill = NA) +
+    geom_sf(data = arc_counties_shp, colour = "black", fill = NA) +
+    geom_sf(data = itp, colour = "red", fill = NA)
+```
+
+Ultimately, we want to try and assign each census tract to being ITP
+or OTP. Firstly, to handle this, we count the number of tracts (where we
+use the 2020 Census Tracts) which intersect with the "perimeter" itself.
+
+```{r}
+ics <- st_intersects(
+    st_transform(st_boundary(itp), crs = 4269),
+    arc_tracts_shp
+)
+
+print(
+    "Number of census tracts intersecting the interstate: ",
+    length(ics[[1]])
+)
+```
+
+As we can see, a small but non-zero number fall inside of this category, and
+so we will keep track of:
+
+- census tracts inside the perimeter (ITP),
+- census tracts on the perimeter (TP), and
+- census tracts outside the perimeter (OTP).
+
+```{r}
+arc_tracts_shp <- arc_tracts_shp %>% 
+    select(NAME, COUNTYFP, TRACTCE, geometry) %>%
+    mutate(
+        tp = st_intersects(
+            st_transform(st_boundary(itp), crs = 4269),
+            geometry, sparse = FALSE
+        )[1, ],
+        itp = st_within(
+            geometry,
+            st_transform(itp, crs = 4269), sparse = FALSE
+        )[, 1],
+        otp = !tp & !itp
+    )
+
+arc_tracts_shp %>% 
+    st_drop_geometry() %>%
+    summarize(
+        tp = sum(tp), itp = sum(itp), otp = sum(otp)
+    )
+```
+
+```{r}
+arc_tracts_shp2 <- arc_tracts_shp %>%
+    pivot_longer(
+        cols = c(tp, itp, otp),
+        names_to = "class",
+        values_to = "in_class"
+    ) %>%
+    filter(in_class == TRUE) %>%
+    select(-in_class)
+
+ggplot() +
+    geom_sf(data = arc_tracts_shp2, colour = "grey", mapping = aes(fill = class)) +
+    geom_sf(data = arc_counties_shp, colour = "black", fill = NA) +
+    geom_sf(data = itp, colour = "red", fill = NA)
+```
+
+# Household income distribution in the Atlanta metro area between 2009 and 2019
+
+```{r, include = FALSE}
+v11 <- load_variables(2011, "acs1", cache = TRUE)
+
+income_variables <- paste0("B19001_0", str_pad(1:17, 2, pad = "0"))
+
+income_var_labels <- v11 %>%
+    filter(name %in% income_variables) %>%
+    select(label) %>% as_vector()
+
+income_var_labels <- sapply(
+    str_split(income_var_labels, "!!"), tail, 1
+)
+
+income_var_list <- setNames(as.list(income_variables), income_var_labels)
+
+df_income_distribution <- map_dfr(
+    years_acs1,
+    ~ get_acs(
+        geography = "county",
+        state = "GA",
+        variables = income_var_list,
+        year = .x,
+        county = arc_counties,
+        survey = "acs1",
+        geometry = FALSE
+    ),
+    .id = "year") %>%
+    mutate(
+        county = gsub("^(.*?),.*", "\\1", NAME)
+    ) %>% select(-NAME) %>% relocate(county, .after = GEOID)
+```
+
+ACS 1-year data from 2009 to 2019, showing the number of households (with
+error estimates) which lie in particular income bands across the ARC counties.
+
+```{r}
+df_income_distribution
+```
+
+## How has the income distribution changed over the years across the Atlanta area?
+
+To answer this, we summarize over all the counties the number of households in
+each income bracket, along with the total number, and do so for each year. The margin
+of errors give 90% confidence intervals of each estimate; to get the margin of error for
+a sum of variables, we sum the square of the margin of error across all the variables,
+and then take the square root. For this analysis, we look at all the counties
+which belong to the Altanta Regional Commission. 
+
+### Looking at number of households
+
+```{r}
+df_income_dist_summary <- df_income_distribution %>%
+    select(year, county, variable, estimate, moe) %>%
+    group_by(year, variable) %>%
+    summarize(
+        estimate = sum(estimate),
+        moe = sqrt(sum(moe**2))
+    ) %>%
+    ungroup() %>%
+    mutate(
+        variable = factor(variable, ordered = TRUE, levels = income_var_labels)
+    ) %>%
+    filter(variable != "Total")
+
+df_income_dist_summary
+
+ggplot(df_income_dist_summary, aes(x = variable, y = estimate)) + 
+    facet_wrap(~ year) +
+    geom_col() +
+    geom_errorbar(aes(ymin = estimate - moe, ymax = estimate + moe)) +
+    labs(
+        x = "Income band", y = "Number of households",
+        title = "Distribution of Household Income in the Atlanta area Between 2009 and 2019"
+    ) + coord_flip()
+```
+
+### Looking at the proportion of households
+
+```{r}
+df_income_prop_summary <- df_income_distribution %>%
+    select(year, county, variable, estimate, moe) %>%
+    group_by(year, variable) %>%
+    summarize(
+        estimate = sum(estimate),
+        moe = sqrt(sum(moe**2))
+    ) %>%
+    ungroup() %>%
+    mutate(
+        variable = factor(variable, ordered = TRUE, levels = income_var_labels)
+    ) %>%
+    filter(variable != "Total") %>%
+    group_by(year) %>%
+    mutate(
+        moe = moe / sum(estimate),
+        estimate = estimate / sum(estimate),
+    )
+
+df_income_prop_summary
+
+ggplot(df_income_prop_summary, aes(x = variable, y = estimate)) + 
+    facet_wrap(~ year) +
+    geom_col() +
+    geom_errorbar(aes(ymin = estimate - moe, ymax = estimate + moe)) +
+    labs(
+        x = "Income band", y = "Proportion of households",
+        title = "Distribution of Household Income in the Atlanta area Between 2009 and 2019"
+    ) + coord_flip()
+```
+
+### Change between 2009 and 2019
+
+Looking at the number of households in each income band at 2009 and 2019, we can see
+that there has been a large increase in the number of households earning $100k or more,
+while the number of households earning less than $50k has mostly stayed constant. 
+
+```{r}
+df_income_dist_summary %>%
+    filter(year %in% c(2009, 2019)) %>%
+    ggplot(aes(x = variable, y = estimate, fill = year)) +
+    geom_col(position = "dodge") +
+    geom_errorbar(
+        aes(ymin = estimate - moe, ymax = estimate + moe), 
+        position = "dodge"
+    ) +
+    labs(
+        y = "Proportion of households", x = "Income band",
+        title = "Distribution of Household Income in the Atlanta area (2009 and 2019)"
+    ) + 
+    coord_flip() 
+```
+
+### Changes across counties over time
+
+```{r}
+df_income_distribution %>%
+    select(year, county, variable, estimate, moe) %>%
+    filter(variable != "Total") %>%
+    group_by(year, county) %>%
+    mutate(estimate = estimate / sum(estimate)) %>%
+    ungroup() %>%
+    mutate(
+        variable = factor(variable, ordered = TRUE, levels = income_var_labels)
+    ) %>%
+    ggplot(aes(x = year, y = estimate, fill = forcats::fct_rev(variable))) +
+    facet_wrap(~ county) +
+    geom_col() + coord_flip() +
+    labs(
+        x = "Year", y = "Proportion of Households", fill = "Income Band",
+        title = "Distribution of Household Income across Counties and Year"
+    ) +
+    theme(legend.position = "bottom")
+```
+
+## How has the income distribution changed ITP and OTP from 2009 to 2019?
+
+```{r}
+df_income_tracts <- map_dfr(
+    lst(2009, 2020),
+    ~ get_acs(
+        geography = "tract",
+        state = "GA",
+        variables = income_var_list,
+        year = .x,
+        county = arc_counties,
+        survey = "acs5",
+        geometry = TRUE
+    ),
+    .id = "year")
+```
