@@ -1,18 +1,31 @@
 ---
-title: "ACS data on counties surrounding Atlanta"
+title: "ACS data on Atlanta and the wider metropoliton area"
 output:
   html_document:
     toc: true
+    toc_depth: 4
+    number_sections: true
+    theme: flatly
+    toc_float:
+        collapsed: false
+    highlight: pygments
     fig_caption: true
+    fig_width: 10
+    fig_height: 8
+    df_print: paged
 ---
 
 ```{r, include = FALSE}
 setwd("/mnt/c/Users/adavi/Documents/comp-journal/ajc-satellite/data-findings/")
+options(width = 1200)
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
 library(tidyverse)
 library(tidycensus)
 library(lubridate)
 library(zoo)
 library(sf)
+library(viridis)
 ```
 
 # Geographic units and time period(s) considered
@@ -102,6 +115,8 @@ arc_counties_shp <- sf::st_read("../ga-counties/Counties_Georgia.shp") %>%
 arc_tracts_shp <- sf::st_read("../ga-tracts-2020/tl_2020_13_tract.shp") %>%
     filter(COUNTYFP %in% arc_counties_shp$COUNTYFP10)
 
+highway_arc <- st_intersection(highways, arc_counties_shp)
+
 ggplot() +
     geom_sf(data = arc_tracts_shp, colour = "grey", fill = NA) +
     geom_sf(data = arc_counties_shp, colour = "black", fill = NA) +
@@ -118,10 +133,10 @@ ics <- st_intersects(
     arc_tracts_shp
 )
 
-print(
-    "Number of census tracts intersecting the interstate: ",
+print(paste(
+    "Number of census tracts intersecting the interstate:",
     length(ics[[1]])
-)
+))
 ```
 
 As we can see, a small but non-zero number fall inside of this category, and
@@ -164,9 +179,13 @@ arc_tracts_shp2 <- arc_tracts_shp %>%
     select(-in_class)
 
 ggplot() +
-    geom_sf(data = arc_tracts_shp2, colour = "grey", mapping = aes(fill = class)) +
+    geom_sf(
+        data = arc_tracts_shp2, colour = "grey",
+        mapping = aes(fill = class)
+    ) +
     geom_sf(data = arc_counties_shp, colour = "black", fill = NA) +
-    geom_sf(data = itp, colour = "red", fill = NA)
+    geom_sf(data = itp, colour = "red", fill = NA) +
+    coord_sf(xlim = c(-84.6, -84), ylim = c(33.4, 34), expand = TRUE)
 ```
 
 # Household income distribution in the Atlanta metro area between 2009 and 2019
@@ -326,7 +345,11 @@ df_income_distribution %>%
 
 ## How has the income distribution changed ITP and OTP from 2009 to 2019?
 
-```{r}
+We note that between the 2009 5-year ACS estimates and the 2020 5-year ACS estimates,
+the number of census tracts has changed, and therefore we will compute for each census
+tract (in each year period) whether it was ITP, TP or OTP.
+
+```{r, results = 'hide'}
 df_income_tracts <- map_dfr(
     lst(2009, 2020),
     ~ get_acs(
@@ -336,7 +359,211 @@ df_income_tracts <- map_dfr(
         year = .x,
         county = arc_counties,
         survey = "acs5",
+        geometry = FALSE
+    ),
+    .id = "year") %>%
+    mutate(
+        tract = gsub("^(.*?),.*", "\\1", NAME),
+        county = gsub("^(.*?), (.*?),.*", "\\2", NAME)
+    ) %>% 
+    select(-NAME) %>%
+    relocate(tract, county, .after = GEOID)
+
+df_tracts <- map_dfr(
+    lst(2009, 2020),
+    ~ get_acs(
+        geography = "tract",
+        state = "GA",
+        variables = "B19001_001",
+        year = .x,
+        county = arc_counties,
+        survey = "acs5",
         geometry = TRUE
     ),
-    .id = "year")
+    .id = "year") %>% 
+    select(year, GEOID, geometry) %>%
+    mutate(
+        tp = st_intersects(
+            st_transform(st_boundary(itp), crs = 4269),
+            geometry, sparse = FALSE
+        )[1, ],
+        itp = st_within(
+            geometry,
+            st_transform(itp, crs = 4269), sparse = FALSE
+        )[, 1],
+        otp = !tp & !itp
+    ) %>%
+    pivot_longer(
+        cols = c(tp, itp, otp),
+        names_to = "class",
+        values_to = "in_class"
+    ) %>%
+    filter(in_class == TRUE) %>%
+    select(-in_class)
+
+df_tracts_peri <- df_tracts %>% st_drop_geometry()
+
+df_income_tracts %>%
+    filter(variable != "Total") %>%
+    left_join(df_tracts_peri) %>%
+    select(year, class, variable, estimate, moe) %>%
+    group_by(year, class, variable) %>%
+    summarize(
+        estimate = sum(estimate),
+        moe = sqrt(sum(moe**2))
+    ) %>% 
+    mutate(
+        variable = factor(variable, ordered = TRUE, levels = income_var_labels)
+    ) %>%
+    group_by(year, class) %>%
+    mutate(
+        moe = moe / sum(estimate),
+        estimate = estimate / sum(estimate)
+    ) %>%
+    ggplot(aes(x = variable, y = estimate, fill = year)) +
+    geom_col(position = "dodge") + 
+    geom_errorbar(
+        aes(ymin = estimate - moe, ymax = estimate + moe),
+        position = "dodge"
+    ) +
+    facet_grid(~ class) +
+    labs(x = "Income band", y = "Proportion of population") +
+    coord_flip()
+```
+
+Examining the three different classes, it appears that the main changes are that
+there are an increasing number of households in very high income brackets both
+inside and outside the perimeter, and that the number of households on the perimeter
+which were in the low income brackets has decreased over the past ten years by
+a considerable amount. (If anything, this seems like the most suprising thing
+I've found here.)
+
+```{r}
+df_income_tracts %>%
+    filter(variable != "Total") %>%
+    left_join(df_tracts_peri) %>%
+    select(year, class, variable, estimate, moe) %>%
+    group_by(year, class, variable) %>%
+    summarize(
+        estimate = sum(estimate),
+        moe = sqrt(sum(moe**2))
+    ) %>% 
+    mutate(
+        variable = factor(variable, ordered = TRUE, levels = income_var_labels)
+    ) %>%
+    ggplot(aes(x = variable, y = estimate, fill = year)) +
+    geom_col(position = "dodge") + 
+    geom_errorbar(
+        aes(ymin = estimate - moe, ymax = estimate + moe),
+        position = "dodge"
+    ) +
+    facet_grid(~ class, scales = "free") +
+    labs(x = "Income band", y = "Proportion of population") +
+    coord_flip()
+```
+
+## How has the income distribution changed across tracts over time?
+
+To compare the income distribution across tracts over time, for each census tract,
+we will look at the proportion of the population in the different income bands, and
+then compare these between 2010 and 2019. (These time periods were chosen so that
+there are no issues in switching between different census tracts.) To do so, we 
+will compute the total variation distance (up to a scalar) between the two distributions;
+formally, if we have $K$ different possible values, and we have two sets of proportions
+labelled $p(i)$ and $q(i)$ (where $i$ can take on $1$, $2$, ..., or $K$), then we compute
+the value
+$$ |p(1) - q(1)| + |p(2) - q(2)| + \cdots + |p(K) - q(K)|, $$
+and use this as a measure of how different $p$ and $q$ are. To try and observe what
+is happening in relation to some other geographical structures, the major highways
+beyond that of the interstate have also been added to the plots below.
+(Apologies for the color blind unfriendly palette.)
+
+```{r, results = 'hide'}
+df_income_tracts <- map_dfr(
+    lst(2010, 2019),
+    ~ get_acs(
+        geography = "tract",
+        state = "GA",
+        variables = income_var_list,
+        year = .x,
+        county = arc_counties,
+        survey = "acs5",
+        geometry = FALSE
+    ),
+    .id = "year") %>%
+    mutate(
+        tract = gsub("^(.*?),.*", "\\1", NAME),
+        county = gsub("^(.*?), (.*?),.*", "\\2", NAME)
+    ) %>% 
+    select(-NAME) %>%
+    relocate(tract, county, .after = GEOID)
+
+df_tracts <- map_dfr(
+    lst(2010),
+    ~ get_acs(
+        geography = "tract",
+        state = "GA",
+        variables = "B19001_001",
+        year = .x,
+        county = arc_counties,
+        survey = "acs5",
+        geometry = TRUE
+    ),
+    .id = "year") %>% 
+    select(GEOID, geometry)
+
+df_income_change_tracts <- df_income_tracts %>%
+    filter(variable != "Total") %>%
+    select(year, GEOID, variable, estimate) %>%
+    mutate(
+        variable = factor(variable, ordered = TRUE, levels = income_var_labels)
+    ) %>%
+    group_by(year, GEOID) %>%
+    mutate(estimate = estimate / sum(estimate)) %>%
+    pivot_wider(
+        names_from = year,
+        names_prefix = "estimate_",
+        values_from = estimate
+    ) %>% 
+    mutate(
+        diff = abs(estimate_2010 - estimate_2019)
+    ) %>%
+    group_by(GEOID) %>%
+    summarize(income_dist_change = sum(diff)) %>%
+    mutate(
+        rank = cume_dist(income_dist_change),
+        rank_dis = ntile(income_dist_change, 10)
+    ) %>%
+    left_join(df_tracts)
+
+df_income_change_tracts %>% 
+    select(-geometry) %>%
+    ggplot(aes(x = 0.5 * income_dist_change)) +
+    geom_histogram() +
+    labs(
+        x = "Total variation distance between income distributions in 2010 and 2019",
+        title = "Histogram of total variation distances between income distributions across census tracts"
+    )
+
+ggplot() +
+    geom_sf(
+        data = df_income_change_tracts, 
+        aes(geometry = geometry, fill = 0.5 * income_dist_change),
+        colour = "grey"
+    ) + scale_fill_viridis(option = "magma") +
+    geom_sf(data = arc_counties_shp, colour = "black", fill = NA) +
+    geom_sf(data = highway_arc, colour = "green", fill = NA) +
+    theme(legend.position = "bottom") +
+    labs(fill = "Total variation of income distributions")
+
+ggplot() +
+    geom_sf(
+        data = df_income_change_tracts, 
+        aes(geometry = geometry, fill = rank_dis),
+        colour = "grey"
+    ) + scale_fill_viridis(option = "magma") +
+    geom_sf(data = arc_counties_shp, colour = "black", fill = NA) +
+    geom_sf(data = highway_arc, colour = "green", fill = NA) +
+    theme(legend.position = "bottom") +
+    labs(fill = "Binned ranking of total variation of income distributions across tracts")
 ```
