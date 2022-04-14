@@ -369,6 +369,37 @@ df_income_tracts <- map_dfr(
     select(-NAME) %>%
     relocate(tract, county, .after = GEOID)
 
+df_tracts_peri_shp <- map_dfr(
+    lst(2009, 2020),
+    ~ get_acs(
+        geography = "tract",
+        state = "GA",
+        variables = "B19001_001",
+        year = .x,
+        county = arc_counties,
+        survey = "acs5",
+        geometry = TRUE
+    ),
+    .id = "year") %>% 
+    select(year, GEOID, geometry) %>%
+    mutate(
+        tp = st_intersects(
+            st_transform(st_boundary(itp), crs = 4269),
+            geometry, sparse = FALSE
+        )[1, ],
+        itp = st_within(
+            geometry,
+            st_transform(itp, crs = 4269), sparse = FALSE
+        )[, 1],
+        otp = !tp & !itp
+    ) %>%
+    pivot_longer(
+        cols = c(tp, itp, otp),
+        names_to = "class",
+        values_to = "in_class"
+    ) %>%
+    filter(in_class == TRUE)
+
 df_tracts <- map_dfr(
     lst(2009, 2020),
     ~ get_acs(
@@ -550,20 +581,446 @@ ggplot() +
         data = df_income_change_tracts, 
         aes(geometry = geometry, fill = 0.5 * income_dist_change),
         colour = "grey"
-    ) + scale_fill_viridis(option = "magma") +
+    ) + scale_fill_viridis(option = "cividis") +
     geom_sf(data = arc_counties_shp, colour = "black", fill = NA) +
     geom_sf(data = highway_arc, colour = "green", fill = NA) +
     theme(legend.position = "bottom") +
     labs(fill = "Total variation of income distributions")
+```
+
+This seems pretty abstract, and so instead we'll look at some "extreme groups":
+
+- households earning more than $200k,
+- households earning less than $50k;
+- households earning between $50k and $75k;
+
+and see where the numbers of these households/proportions have been 
+increasing and decreasing in number the largest. 
+
+```{r, include = FALSE}
+library(scales)
+symlog_trans <- function(base = 10, thr = 1, scale = 1){
+  trans <- function(x)
+    ifelse(abs(x) < thr, x, sign(x) * 
+             (thr + scale * suppressWarnings(log(sign(x) * x / thr, base))))
+
+  inv <- function(x)
+    ifelse(abs(x) < thr, x, sign(x) * 
+             base^((sign(x) * x - thr) / scale) * thr)
+
+  breaks <- function(x){
+    sgn <- sign(x[which.max(abs(x))])
+    if(all(abs(x) < thr))
+      pretty_breaks()(x)
+    else if(prod(x) >= 0){
+      if(min(abs(x)) < thr)
+        sgn * unique(c(pretty_breaks()(c(min(abs(x)), thr)),
+                       log_breaks(base)(c(max(abs(x)), thr))))
+      else
+        sgn * log_breaks(base)(sgn * x)
+    } else {
+      if(min(abs(x)) < thr)
+        unique(c(sgn * log_breaks()(c(max(abs(x)), thr)),
+                 pretty_breaks()(c(sgn * thr, x[which.min(abs(x))]))))
+      else
+        unique(c(-log_breaks(base)(c(thr, -x[1])),
+                 pretty_breaks()(c(-thr, thr)),
+                 log_breaks(base)(c(thr, x[2]))))
+    }
+  }
+  trans_new(paste("symlog", thr, base, scale, sep = "-"), trans, inv, breaks)
+}
+```
+
+```{r}
+df_rdincome_tracts <- df_income_tracts %>%
+    filter(variable != "Total") %>%
+    select(year, GEOID, variable, estimate) %>%
+    mutate(
+        variable = factor(variable, ordered = TRUE, levels = income_var_labels)
+    ) %>%
+    mutate(variable = fct_collapse(variable, 
+        "Less than $50,000" = c(
+            "Less than $10,000", "$10,000 to $14,999", 
+            "$15,000 to $19,999", "$20,000 to $24,999",
+            "$25,000 to $29,999", "$30,000 to $34,999",
+            "$35,000 to $39,999", "$40,000 to $44,999",
+            "$45,000 to $49,999"
+        ),
+        "$50,000 to $74,999" = c("$50,000 to $59,999", "$60,000 to $74,999"),
+        "$75,000 to $99,999" = c("$75,000 to $99,999"),
+        "$100,000 to $149,999" = c(
+            "$100,000 to $124,999", "$125,000 to $149,999"
+        ),
+        "$150,000 to $199,999" = c("$150,000 to $199,999"),
+        "$200,000 or more" = c("$200,000 or more")
+    )) %>%
+    group_by(year, GEOID, variable) %>%
+    summarize(estimate = sum(estimate)) %>%
+    left_join(df_tracts)
+
+p2010 <- ggplot() +
+    geom_sf(
+        data = df_rdincome_tracts %>% filter(year == '2010'),
+        aes(geometry = geometry, fill = estimate),
+        colour = "grey", lwd = 0.25
+    ) + scale_fill_viridis(option = "viridis", trans = 'sqrt') +
+    facet_wrap(~ variable) + 
+    geom_sf(data = arc_counties_shp, colour = "black", fill = NA) +
+    geom_sf(data = highway_arc, colour = "#f100e5", fill = NA) +
+    theme(legend.position = "bottom") + 
+    labs(
+        fill = "Number of households",
+        title = "Number of households by income band and tract",
+        subtitle = "(Data using 5-year estimates from the 2006-2010 ACS)"
+    ) +
+    theme(legend.key.width = unit(2, 'cm'))
+
+p2019 <- ggplot() +
+    geom_sf(
+        data = df_rdincome_tracts %>% filter(year == '2019'),
+        aes(geometry = geometry, fill = estimate),
+        colour = "grey", lwd = 0.25
+    ) + scale_fill_viridis(option = "viridis", trans = 'log10') +
+    facet_wrap(~ variable) +
+    geom_sf(data = arc_counties_shp, colour = "black", fill = NA) +
+    geom_sf(data = highway_arc, colour = "#f100e5", fill = NA) +
+    theme(legend.position = "bottom") +
+    labs(
+        fill = "Number of households",
+        title = "Number of households by income band and tract",
+        subtitle = "(Data using 5-year estimates from the 2015-2019 ACS)"
+    ) +
+    theme(legend.key.width = unit(2, 'cm'))
+
+df_rdincome_change_tracts <- df_income_tracts %>%
+    filter(variable != "Total") %>%
+    select(year, GEOID, variable, estimate) %>%
+    mutate(
+        variable = factor(variable, ordered = TRUE, levels = income_var_labels)
+    ) %>%
+    mutate(variable = fct_collapse(variable, 
+        "Less than $50,000" = c(
+            "Less than $10,000", "$10,000 to $14,999", 
+            "$15,000 to $19,999", "$20,000 to $24,999",
+            "$25,000 to $29,999", "$30,000 to $34,999",
+            "$35,000 to $39,999", "$40,000 to $44,999",
+            "$45,000 to $49,999"
+        ),
+        "$50,000 to $74,999" = c("$50,000 to $59,999", "$60,000 to $74,999"),
+        "$75,000 to $99,999" = c("$75,000 to $99,999"),
+        "$100,000 to $149,999" = c(
+            "$100,000 to $124,999", "$125,000 to $149,999"
+        ),
+        "$150,000 to $199,999" = c("$150,000 to $199,999"),
+        "$200,000 or more" = c("$200,000 or more")
+    )) %>%
+    group_by(year, GEOID, variable) %>%
+    summarize(estimate = sum(estimate)) %>%
+    pivot_wider(
+        names_from = "year",
+        names_prefix = "estimate_",
+        values_from = "estimate"
+    ) %>%
+    mutate(change = estimate_2019 - estimate_2010) %>%
+    left_join(df_tracts)
+
+df_rdincome_change_tracts %>%
+    ggplot(aes(x = change)) + geom_histogram() +
+    facet_wrap(~ variable)
 
 ggplot() +
     geom_sf(
-        data = df_income_change_tracts, 
-        aes(geometry = geometry, fill = rank_dis),
-        colour = "grey"
-    ) + scale_fill_viridis(option = "magma") +
+        data = df_rdincome_change_tracts,
+        aes(geometry = geometry, fill = change),
+        colour = "grey", lwd = 0.25
+    ) + scale_fill_viridis(option = "turbo") +
+    facet_wrap(~ variable) + 
     geom_sf(data = arc_counties_shp, colour = "black", fill = NA) +
-    geom_sf(data = highway_arc, colour = "green", fill = NA) +
+    geom_sf(data = highway_arc, colour = "#009b00", fill = NA) +
     theme(legend.position = "bottom") +
-    labs(fill = "Binned ranking of total variation of income distributions across tracts")
+    labs(
+        fill = "Net change in households",
+        title = "Change in number of households by income band and tract",
+        subtitle = "(Data using 5-year estimates from the 2006-2010 ACS and 2015-2019 ACS)"
+    ) +
+    theme(legend.key.width = unit(2, 'cm'))
 ```
+
+```{r}
+df_rdincome_prop_tracts <- df_income_tracts %>%
+    filter(variable != "Total") %>%
+    select(year, GEOID, variable, estimate) %>%
+    mutate(
+        variable = factor(variable, ordered = TRUE, levels = income_var_labels)
+    ) %>%
+    mutate(variable = fct_collapse(variable, 
+        "Less than $50,000" = c(
+            "Less than $10,000", "$10,000 to $14,999", 
+            "$15,000 to $19,999", "$20,000 to $24,999",
+            "$25,000 to $29,999", "$30,000 to $34,999",
+            "$35,000 to $39,999", "$40,000 to $44,999",
+            "$45,000 to $49,999"
+        ),
+        "$50,000 to $74,999" = c("$50,000 to $59,999", "$60,000 to $74,999"),
+        "$75,000 to $99,999" = c("$75,000 to $99,999"),
+        "$100,000 to $149,999" = c(
+            "$100,000 to $124,999", "$125,000 to $149,999"
+        ),
+        "$150,000 to $199,999" = c("$150,000 to $199,999"),
+        "$200,000 or more" = c("$200,000 or more")
+    )) %>%
+    group_by(year, GEOID, variable) %>%
+    summarize(estimate = sum(estimate)) %>% 
+    group_by(year, GEOID) %>%
+    mutate(estimate = estimate / sum(estimate)) %>%
+    left_join(df_tracts)
+
+pincome2010 <- ggplot() +
+    geom_sf(
+        data = df_rdincome_prop_tracts %>% filter(year == '2010'),
+        aes(geometry = geometry, fill = estimate),
+        colour = "grey", lwd = 0.25
+    ) + scale_fill_viridis(option = "viridis", trans = 'sqrt') +
+    facet_wrap(~ variable) + 
+    geom_sf(data = arc_counties_shp, colour = "black", fill = NA) +
+    geom_sf(data = highway_arc, colour = "#f100e5", fill = NA) +
+    theme(legend.position = "bottom") + 
+    labs(
+        fill = "Proportion of households",
+        title = "Proportion of households by income band in census tracts",
+        subtitle = "(Data using 5-year estimates from the 2006-2010 ACS)"
+    ) +
+    theme(legend.key.width = unit(2, 'cm'))
+
+pincome2019 <- ggplot() +
+    geom_sf(
+        data = df_rdincome_prop_tracts %>% filter(year == '2019'),
+        aes(geometry = geometry, fill = estimate),
+        colour = "grey", lwd = 0.25
+    ) + scale_fill_viridis(option = "viridis", trans = 'log10') +
+    facet_wrap(~ variable) +
+    geom_sf(data = arc_counties_shp, colour = "black", fill = NA) +
+    geom_sf(data = highway_arc, colour = "#f100e5", fill = NA) +
+    theme(legend.position = "bottom") +
+    labs(
+        fill = "Proportion of households",
+        title = "Proportion of households by income band in census tracts",
+        subtitle = "(Data using 5-year estimates from the 2015-2019 ACS)"
+    ) +
+    theme(legend.key.width = unit(2, 'cm'))
+
+df_rdincome_prop_change_tracts <- df_income_tracts %>%
+    filter(variable != "Total") %>%
+    select(year, GEOID, variable, estimate) %>%
+    mutate(
+        variable = factor(variable, ordered = TRUE, levels = income_var_labels)
+    ) %>%
+    mutate(variable = fct_collapse(variable, 
+        "Less than $50,000" = c(
+            "Less than $10,000", "$10,000 to $14,999", 
+            "$15,000 to $19,999", "$20,000 to $24,999",
+            "$25,000 to $29,999", "$30,000 to $34,999",
+            "$35,000 to $39,999", "$40,000 to $44,999",
+            "$45,000 to $49,999"
+        ),
+        "$50,000 to $74,999" = c("$50,000 to $59,999", "$60,000 to $74,999"),
+        "$75,000 to $99,999" = c("$75,000 to $99,999"),
+        "$100,000 to $149,999" = c(
+            "$100,000 to $124,999", "$125,000 to $149,999"
+        ),
+        "$150,000 to $199,999" = c("$150,000 to $199,999"),
+        "$200,000 or more" = c("$200,000 or more")
+    )) %>%
+    group_by(year, GEOID, variable) %>%
+    summarize(estimate = sum(estimate)) %>% 
+    group_by(year, GEOID) %>%
+    mutate(estimate = estimate / sum(estimate)) %>%
+    ungroup() %>%
+    pivot_wider(
+        names_from = "year",
+        names_prefix = "estimate_",
+        values_from = "estimate"
+    ) %>%
+    mutate(change = estimate_2019 - estimate_2010) %>%
+    left_join(df_tracts)
+
+df_rdincome_prop_change_tracts %>%
+    ggplot(aes(x = change)) + geom_histogram() +
+    facet_wrap(~ variable)
+
+p1 <- ggplot() +
+    geom_sf(
+        data = df_rdincome_prop_change_tracts,
+        aes(geometry = geometry, fill = change),
+        colour = "grey", lwd = 0.25
+    ) + scale_fill_viridis(option = "turbo") +
+    facet_wrap(~ variable) + 
+    geom_sf(data = arc_counties_shp, colour = "black", fill = NA) +
+    geom_sf(data = highway_arc, colour = "#009b00", fill = NA) +
+    theme(legend.position = "bottom") +
+    labs(
+        fill = "Change in proportion of households",
+        title = "Change in proportion of households in income band by tract",
+        subtitle = "(Data using 5-year estimates from the 2006-2010 ACS and 2015-2019 ACS)"
+    ) +
+    theme(legend.key.width = unit(2, 'cm'))
+
+p1
+ggsave("income_changes_all.pdf")
+
+p2 <- ggplot() +
+    geom_sf(
+        data = df_rdincome_prop_change_tracts %>%
+            filter(variable %in% c("Less than $50,000", "$200,000 or more")),
+        aes(geometry = geometry, fill = change),
+        colour = "grey", lwd = 0.25
+    ) + scale_fill_viridis(option = "turbo") +
+    facet_wrap(~ variable) + 
+    geom_sf(data = arc_counties_shp, colour = "black", fill = NA) +
+    geom_sf(data = highway_arc, colour = "#009b00", fill = NA) +
+    theme(legend.position = "bottom") +
+    labs(
+        fill = "Change in proportion of households",
+        title = "Change in proportion of households in income band by tract",
+        subtitle = "(Data using 5-year estimates from the 2006-2010 ACS and 2015-2019 ACS)"
+    ) +
+    theme(legend.key.width = unit(2, 'cm'))
+
+p2
+ggsave("income_changes_extreme.pdf")
+```
+
+```{r, include = FALSE, eval = FALSE}
+tdf <- df_rdincome_prop_change_tracts %>%
+    select(GEOID, change, variable) %>%
+    filter(variable %in% c("Less than $50,000", "$200,000 or more")) %>%
+    pivot_wider(
+        names_from = variable,
+        values_from = change
+    ) %>%
+    left_join(
+        df_tracts_peri_shp %>% st_drop_geometry() %>% select(GEOID, class)
+    ) %>%
+    filter(`Less than $50,000` < 0, class == 'otp') %>%
+    select(-GEOID, -class)
+
+cor.test(tdf$`Less than $50,000`, tdf$`$200,000 or more`, method = "spearman")
+
+df_rdincome_prop_change_tracts %>%
+    select(GEOID, change, variable) %>%
+    filter(variable %in% c("Less than $50,000", "$200,000 or more")) %>%
+    left_join(
+        df_tracts_peri_shp %>% st_drop_geometry() %>% select(GEOID, class)
+    ) %>%
+    ggplot(aes(x = change, fill = class)) + 
+    geom_histogram() +
+    facet_grid(variable ~ class)
+
+ggsave("income_changes_histogram.pdf")
+```
+
+Let's zoom inside the perimeter to see what is happening here
+a bit more carefully.
+
+```{r}
+p1 + coord_sf(xlim = c(-84.53, -84.2), ylim = c(33.6, 33.95), expand = FALSE)
+ggsave("income_changes_all_itp.pdf")
+
+p2 + coord_sf(xlim = c(-84.53, -84.2), ylim = c(33.6, 33.95), expand = FALSE) 
+ggsave("income_changes_extreme_itp.pdf")
+```
+
+Let's also just look at the actual numbers of households, rather than the
+change in proportions over time. (This should let us see if the effects we
+are seeing are due to chance, or are of evidence of an actual pattern). 
+
+```{r}
+df_rdincome_total_change_tracts <- df_income_tracts %>%
+    filter(variable != "Total") %>%
+    select(year, GEOID, variable, estimate) %>%
+    mutate(
+        variable = factor(variable, ordered = TRUE, levels = income_var_labels)
+    ) %>%
+    mutate(variable = fct_collapse(variable, 
+        "Less than $50,000" = c(
+            "Less than $10,000", "$10,000 to $14,999", 
+            "$15,000 to $19,999", "$20,000 to $24,999",
+            "$25,000 to $29,999", "$30,000 to $34,999",
+            "$35,000 to $39,999", "$40,000 to $44,999",
+            "$45,000 to $49,999"
+        ),
+        "$50,000 to $74,999" = c("$50,000 to $59,999", "$60,000 to $74,999"),
+        "$75,000 to $99,999" = c("$75,000 to $99,999"),
+        "$100,000 to $149,999" = c(
+            "$100,000 to $124,999", "$125,000 to $149,999"
+        ),
+        "$150,000 to $199,999" = c("$150,000 to $199,999"),
+        "$200,000 or more" = c("$200,000 or more")
+    )) %>%
+    group_by(year, GEOID, variable) %>%
+    summarize(estimate = sum(estimate)) %>%
+    ungroup() %>%
+    pivot_wider(
+        names_from = "year",
+        names_prefix = "estimate_",
+        values_from = "estimate"
+    ) %>%
+    mutate(change = estimate_2019 - estimate_2010) %>%
+    left_join(df_tracts)
+
+p1_total <- ggplot() +
+    geom_sf(
+        data = df_rdincome_total_change_tracts,
+        aes(geometry = geometry, fill = change),
+        colour = "grey", lwd = 0.25
+    ) + scale_fill_viridis(option = "turbo") +
+    facet_wrap(~ variable) + 
+    geom_sf(data = arc_counties_shp, colour = "black", fill = NA) +
+    geom_sf(data = highway_arc, colour = "#009b00", fill = NA) +
+    theme(legend.position = "bottom") +
+    labs(
+        fill = "Change in proportion of households",
+        title = "Change in proportion of households in income band by tract",
+        subtitle = "(Data using 5-year estimates from the 2006-2010 ACS and 2015-2019 ACS)"
+    ) +
+    theme(legend.key.width = unit(2, 'cm'))
+
+p1_total
+ggsave("income_changes_all_raw.pdf")
+
+p2_total <- ggplot() +
+    geom_sf(
+        data = df_rdincome_total_change_tracts %>%
+            filter(variable %in% c("Less than $50,000", "$200,000 or more")),
+        aes(geometry = geometry, fill = change),
+        colour = "grey", lwd = 0.25
+    ) + scale_fill_viridis(option = "turbo") +
+    facet_wrap(~ variable) + 
+    geom_sf(data = arc_counties_shp, colour = "black", fill = NA) +
+    geom_sf(data = highway_arc, colour = "#009b00", fill = NA) +
+    theme(legend.position = "bottom") +
+    labs(
+        fill = "Change in proportion of households",
+        title = "Change in proportion of households in income band by tract",
+        subtitle = "(Data using 5-year estimates from the 2006-2010 ACS and 2015-2019 ACS)"
+    ) +
+    theme(legend.key.width = unit(2, 'cm'))
+
+p2_total
+ggsave("income_changes_extreme_raw.pdf")
+```
+
+# Migration patterns - income of people moving inside census tracts
+
+Questions I want to answer:
+- From the ACS data, get the median income of those who are moving
+inside different census tracts from within the state as compared to
+outside of the state for the ARC counties.
+- For the income plots above, do the same rebinning as what was
+done to create the migration plots.
+- Areas of interest from the extremes map:
+    - The place in Forsyth County ()
+    - The place "in the wedge"
+    - The place at the intersection of DeKalb and Fulton
+    - 11 o-clock in the perimeter

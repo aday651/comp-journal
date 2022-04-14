@@ -43,6 +43,12 @@ acs_variables <- c(
     pop_foreign_born = "B05002_013"
 )
 
+
+arc_counties <- c(
+    "Fulton", "DeKalb", "Gwinnett", "Cobb", "Clayton", "Forsyth",
+    "Cherokee", "Douglas", "Fayette", "Henry", "Rockdale"
+)
+
 counties_list_1 <- c(
     'Fulton', 'Gwinnett',
     'Cobb', 'DeKalb', 'Clayton',
@@ -94,8 +100,8 @@ df_counties_temp <- map_dfr(
         state = "GA",
         variables = acs_variables,
         year = .x,
-        county = counties_list,
-        survey = "acs5",
+        county = arc_counties,
+        survey = "acs1",
         geometry = FALSE
     ),
     .id = "year")
@@ -104,6 +110,27 @@ df_counties <- df_counties_temp %>%
     mutate(
         county = gsub("^(.*?),.*", "\\1", NAME)
     ) %>% select(-NAME) %>% relocate(county, .after = GEOID)
+
+df_counties %>%
+    filter(
+        variable == 'median_rent'
+    ) %>% select(year, county, estimate) %>%
+    pivot_wider(
+        names_from = "year",
+        names_prefix = "median_rent_",
+        values_from = estimate
+    )
+
+df_counties %>%
+    filter(
+        variable == 'median_rent_income_percent',
+    ) %>% select(year, county, estimate) %>%
+    pivot_wider(
+        names_from = "year",
+        names_prefix = "median_rent_income_percent_",
+        values_from = estimate
+    )
+
 
 write_csv(df_counties, 'ajc-satellite/data/acs1_counties.csv')
 
