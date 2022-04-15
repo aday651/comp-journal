@@ -13,6 +13,7 @@ output:
     fig_width: 10
     fig_height: 8
     df_print: paged
+    self_contained: false
 ---
 
 ```{r, include = FALSE}
@@ -77,7 +78,7 @@ years_acs1 <- lst(
 )
 
 years_acs5 <- lst(
-    2009, 2010, 2011, 2012, 2013, 2014, 
+    2010, 2011, 2012, 2013, 2014, 
     2015, 2016, 2017, 2018, 2019, 2020
 )
 ```
@@ -220,6 +221,35 @@ df_income_distribution <- map_dfr(
     mutate(
         county = gsub("^(.*?),.*", "\\1", NAME)
     ) %>% select(-NAME) %>% relocate(county, .after = GEOID)
+
+df_income_distribution <- df_income_distribution %>%
+    mutate(variable = fct_collapse(variable, 
+            "Less than $50,000" = c(
+                "Less than $10,000", "$10,000 to $14,999", 
+                "$15,000 to $19,999", "$20,000 to $24,999",
+                "$25,000 to $29,999", "$30,000 to $34,999",
+                "$35,000 to $39,999", "$40,000 to $44,999",
+                "$45,000 to $49,999"
+            ),
+            "$50,000 to $74,999" = c("$50,000 to $59,999", "$60,000 to $74,999"),
+            "$75,000 to $99,999" = c("$75,000 to $99,999"),
+            "$100,000 to $149,999" = c(
+                "$100,000 to $124,999", "$125,000 to $149,999"
+            ),
+            "$150,000 to $199,999" = c("$150,000 to $199,999"),
+            "$200,000 or more" = c("$200,000 or more")
+        )) %>%
+    group_by(year, GEOID, county, variable) %>%
+    summarize(
+        estimate = sum(estimate),
+        moe = sqrt(sum(moe**2))
+    )
+
+income_var_labels <- c(
+    "Less than $50,000", "$50,000 to $74,999",
+    "$75,000 to $99,999", "$100,000 to $149,999",
+    "$150,000 to $199,999", "$200,000 or more"
+)
 ```
 
 ACS 1-year data from 2009 to 2019, showing the number of households (with
@@ -250,11 +280,14 @@ df_income_dist_summary <- df_income_distribution %>%
     ) %>%
     ungroup() %>%
     mutate(
-        variable = factor(variable, ordered = TRUE, levels = income_var_labels)
+        variable = factor(variable, ordered = TRUE,
+        levels = income_var_labels)
     ) %>%
     filter(variable != "Total")
 
 df_income_dist_summary
+
+require(scales)
 
 ggplot(df_income_dist_summary, aes(x = variable, y = estimate)) + 
     facet_wrap(~ year) +
@@ -263,7 +296,21 @@ ggplot(df_income_dist_summary, aes(x = variable, y = estimate)) +
     labs(
         x = "Income band", y = "Number of households",
         title = "Distribution of Household Income in the Atlanta area Between 2009 and 2019"
-    ) + coord_flip()
+    ) + scale_y_continuous(labels = comma) +
+    coord_flip()
+```
+
+```{r}
+df_income_dist_summary %>%
+    mutate(year = as.Date(paste(year, 1, 1, sep = "-"))) %>%
+    ggplot(aes(
+        x = year, y = estimate, col = variable, fill = variable,
+        ymin = estimate - moe, ymax = estimate + moe)
+    ) + geom_point() + geom_line() + geom_ribbon(alpha = 0.2) +
+    labs(
+        x = "Year", y = "Number of households",
+        col = "Income band"
+    )
 ```
 
 ### Looking at the proportion of households
@@ -296,7 +343,7 @@ ggplot(df_income_prop_summary, aes(x = variable, y = estimate)) +
     labs(
         x = "Income band", y = "Proportion of households",
         title = "Distribution of Household Income in the Atlanta area Between 2009 and 2019"
-    ) + coord_flip()
+    ) + scale_y_continuous(labels = comma) + coord_flip()
 ```
 
 ### Change between 2009 and 2019
@@ -306,19 +353,29 @@ that there has been a large increase in the number of households earning $100k o
 while the number of households earning less than $50k has mostly stayed constant. 
 
 ```{r}
+cbPalette <- c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+
 df_income_dist_summary %>%
     filter(year %in% c(2009, 2019)) %>%
+    mutate(year = factor(year)) %>%
     ggplot(aes(x = variable, y = estimate, fill = year)) +
     geom_col(position = "dodge") +
     geom_errorbar(
         aes(ymin = estimate - moe, ymax = estimate + moe), 
         position = "dodge"
-    ) +
-    labs(
-        y = "Proportion of households", x = "Income band",
-        title = "Distribution of Household Income in the Atlanta area (2009 and 2019)"
+    ) + scale_fill_manual(values = cbPalette) +
+    geom_text(
+        aes(label = year, y = 10000), 
+        position = position_dodge(width = 1),
+        size = 5, hjust = 'left',
+        col = "white"
     ) + 
-    coord_flip() 
+    labs(
+        y = "Number of households", x = "Income band",
+        title = "Distribution of Household Income in the Atlanta area (2009 and 2019)", fill = "Year",
+        subtitle = "Data from the 1-year ACS from 2009 and 2019"
+    ) + scale_y_continuous(labels = comma) +
+    coord_flip() + theme(legend.position = "none")
 ```
 
 ### Changes across counties over time
@@ -334,10 +391,10 @@ df_income_distribution %>%
         variable = factor(variable, ordered = TRUE, levels = income_var_labels)
     ) %>%
     ggplot(aes(x = year, y = estimate, fill = forcats::fct_rev(variable))) +
-    facet_wrap(~ county) +
+    facet_wrap(~ county, scales = "free") +
     geom_col() + coord_flip() +
     labs(
-        x = "Year", y = "Proportion of Households", fill = "Income Band",
+        x = "Year", y = "Number of Households", fill = "Income Band",
         title = "Distribution of Household Income across Counties and Year"
     ) +
     theme(legend.position = "bottom")
@@ -438,11 +495,27 @@ df_income_tracts %>%
     filter(variable != "Total") %>%
     left_join(df_tracts_peri) %>%
     select(year, class, variable, estimate, moe) %>%
+    mutate(variable = fct_collapse(variable, 
+            "Less than $50,000" = c(
+                "Less than $10,000", "$10,000 to $14,999", 
+                "$15,000 to $19,999", "$20,000 to $24,999",
+                "$25,000 to $29,999", "$30,000 to $34,999",
+                "$35,000 to $39,999", "$40,000 to $44,999",
+                "$45,000 to $49,999"
+            ),
+            "$50,000 to $74,999" = c("$50,000 to $59,999", "$60,000 to $74,999"),
+            "$75,000 to $99,999" = c("$75,000 to $99,999"),
+            "$100,000 to $149,999" = c(
+                "$100,000 to $124,999", "$125,000 to $149,999"
+            ),
+            "$150,000 to $199,999" = c("$150,000 to $199,999"),
+            "$200,000 or more" = c("$200,000 or more")
+        )) %>%
     group_by(year, class, variable) %>%
     summarize(
         estimate = sum(estimate),
         moe = sqrt(sum(moe**2))
-    ) %>% 
+    ) %>%
     mutate(
         variable = factor(variable, ordered = TRUE, levels = income_var_labels)
     ) %>%
@@ -458,7 +531,7 @@ df_income_tracts %>%
         position = "dodge"
     ) +
     facet_grid(~ class) +
-    labs(x = "Income band", y = "Proportion of population") +
+    labs(x = "Income band", y = "Proportion of households") +
     coord_flip()
 ```
 
@@ -474,6 +547,22 @@ df_income_tracts %>%
     filter(variable != "Total") %>%
     left_join(df_tracts_peri) %>%
     select(year, class, variable, estimate, moe) %>%
+    mutate(variable = fct_collapse(variable, 
+            "Less than $50,000" = c(
+                "Less than $10,000", "$10,000 to $14,999", 
+                "$15,000 to $19,999", "$20,000 to $24,999",
+                "$25,000 to $29,999", "$30,000 to $34,999",
+                "$35,000 to $39,999", "$40,000 to $44,999",
+                "$45,000 to $49,999"
+            ),
+            "$50,000 to $74,999" = c("$50,000 to $59,999", "$60,000 to $74,999"),
+            "$75,000 to $99,999" = c("$75,000 to $99,999"),
+            "$100,000 to $149,999" = c(
+                "$100,000 to $124,999", "$125,000 to $149,999"
+            ),
+            "$150,000 to $199,999" = c("$150,000 to $199,999"),
+            "$200,000 or more" = c("$200,000 or more")
+        )) %>%
     group_by(year, class, variable) %>%
     summarize(
         estimate = sum(estimate),
@@ -489,7 +578,7 @@ df_income_tracts %>%
         position = "dodge"
     ) +
     facet_grid(~ class, scales = "free") +
-    labs(x = "Income band", y = "Proportion of population") +
+    labs(x = "Income band", y = "Number of households") +
     coord_flip()
 ```
 
@@ -543,12 +632,40 @@ df_tracts <- map_dfr(
     .id = "year") %>% 
     select(GEOID, geometry)
 
-df_income_change_tracts <- df_income_tracts %>%
+df_total_households_tracts <- df_income_tracts %>%
+    filter(variable == 'Total') %>% 
+    select(year, GEOID, estimate, moe)
+
+df_total_households_tracts2 <- df_total_households_tracts %>% 
+    filter(year == '2019') %>% select(GEOID, estimate)
+
+df_income_change_long <- df_income_tracts %>%
     filter(variable != "Total") %>%
     select(year, GEOID, variable, estimate) %>%
+    mutate(variable = fct_collapse(variable, 
+            "Less than $50,000" = c(
+                "Less than $10,000", "$10,000 to $14,999", 
+                "$15,000 to $19,999", "$20,000 to $24,999",
+                "$25,000 to $29,999", "$30,000 to $34,999",
+                "$35,000 to $39,999", "$40,000 to $44,999",
+                "$45,000 to $49,999"
+            ),
+            "$50,000 to $74,999" = c("$50,000 to $59,999", "$60,000 to $74,999"),
+            "$75,000 to $99,999" = c("$75,000 to $99,999"),
+            "$100,000 to $149,999" = c(
+                "$100,000 to $124,999", "$125,000 to $149,999"
+            ),
+            "$150,000 to $199,999" = c("$150,000 to $199,999"),
+            "$200,000 or more" = c("$200,000 or more")
+        )) %>%
+    group_by(year, GEOID, variable) %>%
+    summarize(estimate = sum(estimate)) %>%
+    ungroup() %>%
     mutate(
         variable = factor(variable, ordered = TRUE, levels = income_var_labels)
-    ) %>%
+    )
+
+df_income_change_tracts <- df_income_change_long %>%
     group_by(year, GEOID) %>%
     mutate(estimate = estimate / sum(estimate)) %>%
     pivot_wider(
@@ -560,32 +677,60 @@ df_income_change_tracts <- df_income_tracts %>%
         diff = abs(estimate_2010 - estimate_2019)
     ) %>%
     group_by(GEOID) %>%
-    summarize(income_dist_change = sum(diff)) %>%
-    mutate(
-        rank = cume_dist(income_dist_change),
-        rank_dis = ntile(income_dist_change, 10)
-    ) %>%
+    summarize(income_dist_change = 0.5*sum(diff)) %>%
     left_join(df_tracts)
+
+df_income_change_overall <- df_income_change_long %>%
+    group_by(year) %>%
+    mutate(estimate = estimate / sum(estimate)) %>%
+    pivot_wider(
+        names_from = year,
+        names_prefix = "estimate_",
+        values_from = estimate
+    ) %>% 
+    mutate(
+        diff = abs(estimate_2010 - estimate_2019)
+    ) %>%
+    summarize(income_dist_change = 0.5 * sum(diff))
+
+plot(
+    df_total_households_tracts2$estimate, df_income_change_tracts$income_dist_change,
+    xlab = "Number of households in census tract",
+    ylab = "Total variation of income distribution change in census tract",
+    main = "Number of households vs income change across census tracts",
+    sub = "(Horizontal red line corresponds to level of income change across all Atlanta)"
+) 
+abline(h = as.numeric(df_income_change_overall), col = "red", lwd = 3)
 
 df_income_change_tracts %>% 
     select(-geometry) %>%
-    ggplot(aes(x = 0.5 * income_dist_change)) +
+    ggplot(aes(x = income_dist_change)) +
     geom_histogram() +
+    geom_vline(
+        xintercept = as.numeric(df_income_change_overall),
+        col = "red"
+    ) +
     labs(
         x = "Total variation distance between income distributions in 2010 and 2019",
-        title = "Histogram of total variation distances between income distributions across census tracts"
+        title = "Histogram of total variation distances between income distributions across census tracts",  
+        y = "Number of census tracts", 
+        subtitle = "(Vertical red line represents the overall distribution change across Atlanta)"
     )
 
 ggplot() +
     geom_sf(
         data = df_income_change_tracts, 
-        aes(geometry = geometry, fill = 0.5 * income_dist_change),
+        aes(geometry = geometry, fill = income_dist_change),
         colour = "grey"
-    ) + scale_fill_viridis(option = "cividis") +
+    ) + scale_fill_viridis(option = "magma") +
     geom_sf(data = arc_counties_shp, colour = "black", fill = NA) +
     geom_sf(data = highway_arc, colour = "green", fill = NA) +
     theme(legend.position = "bottom") +
-    labs(fill = "Total variation of income distributions")
+    labs(
+        fill = "Total variation of income distributions",
+        title = "Change in income distribution by census tract",
+        subtitle = "(Data from the 5 year 2006-2010 and 2015-2019 ACS)"
+    )
 ```
 
 This seems pretty abstract, and so instead we'll look at some "extreme groups":
@@ -636,9 +781,6 @@ symlog_trans <- function(base = 10, thr = 1, scale = 1){
 df_rdincome_tracts <- df_income_tracts %>%
     filter(variable != "Total") %>%
     select(year, GEOID, variable, estimate) %>%
-    mutate(
-        variable = factor(variable, ordered = TRUE, levels = income_var_labels)
-    ) %>%
     mutate(variable = fct_collapse(variable, 
         "Less than $50,000" = c(
             "Less than $10,000", "$10,000 to $14,999", 
@@ -655,6 +797,9 @@ df_rdincome_tracts <- df_income_tracts %>%
         "$150,000 to $199,999" = c("$150,000 to $199,999"),
         "$200,000 or more" = c("$200,000 or more")
     )) %>%
+    mutate(
+        variable = factor(variable, ordered = TRUE, levels = income_var_labels)
+    ) %>%
     group_by(year, GEOID, variable) %>%
     summarize(estimate = sum(estimate)) %>%
     left_join(df_tracts)
@@ -696,9 +841,6 @@ p2019 <- ggplot() +
 df_rdincome_change_tracts <- df_income_tracts %>%
     filter(variable != "Total") %>%
     select(year, GEOID, variable, estimate) %>%
-    mutate(
-        variable = factor(variable, ordered = TRUE, levels = income_var_labels)
-    ) %>%
     mutate(variable = fct_collapse(variable, 
         "Less than $50,000" = c(
             "Less than $10,000", "$10,000 to $14,999", 
@@ -715,6 +857,9 @@ df_rdincome_change_tracts <- df_income_tracts %>%
         "$150,000 to $199,999" = c("$150,000 to $199,999"),
         "$200,000 or more" = c("$200,000 or more")
     )) %>%
+    mutate(
+        variable = factor(variable, ordered = TRUE, levels = income_var_labels)
+    ) %>%
     group_by(year, GEOID, variable) %>%
     summarize(estimate = sum(estimate)) %>%
     pivot_wider(
@@ -727,7 +872,13 @@ df_rdincome_change_tracts <- df_income_tracts %>%
 
 df_rdincome_change_tracts %>%
     ggplot(aes(x = change)) + geom_histogram() +
-    facet_wrap(~ variable)
+    facet_wrap(~ variable) + 
+    labs(
+        x = "Change in number of households", 
+        y = "Number of census tracts",
+        title = "Change in number of households in different income bands across census tracts", 
+        subtitle = "(Data from the 5-year ACS 2006-2010 and 2015-2019)"
+    )
 
 ggplot() +
     geom_sf(
@@ -751,9 +902,6 @@ ggplot() +
 df_rdincome_prop_tracts <- df_income_tracts %>%
     filter(variable != "Total") %>%
     select(year, GEOID, variable, estimate) %>%
-    mutate(
-        variable = factor(variable, ordered = TRUE, levels = income_var_labels)
-    ) %>%
     mutate(variable = fct_collapse(variable, 
         "Less than $50,000" = c(
             "Less than $10,000", "$10,000 to $14,999", 
@@ -770,6 +918,9 @@ df_rdincome_prop_tracts <- df_income_tracts %>%
         "$150,000 to $199,999" = c("$150,000 to $199,999"),
         "$200,000 or more" = c("$200,000 or more")
     )) %>%
+    mutate(
+        variable = factor(variable, ordered = TRUE, levels = income_var_labels)
+    ) %>%
     group_by(year, GEOID, variable) %>%
     summarize(estimate = sum(estimate)) %>% 
     group_by(year, GEOID) %>%
@@ -813,9 +964,6 @@ pincome2019 <- ggplot() +
 df_rdincome_prop_change_tracts <- df_income_tracts %>%
     filter(variable != "Total") %>%
     select(year, GEOID, variable, estimate) %>%
-    mutate(
-        variable = factor(variable, ordered = TRUE, levels = income_var_labels)
-    ) %>%
     mutate(variable = fct_collapse(variable, 
         "Less than $50,000" = c(
             "Less than $10,000", "$10,000 to $14,999", 
@@ -832,6 +980,9 @@ df_rdincome_prop_change_tracts <- df_income_tracts %>%
         "$150,000 to $199,999" = c("$150,000 to $199,999"),
         "$200,000 or more" = c("$200,000 or more")
     )) %>%
+    mutate(
+        variable = factor(variable, ordered = TRUE, levels = income_var_labels)
+    ) %>%
     group_by(year, GEOID, variable) %>%
     summarize(estimate = sum(estimate)) %>% 
     group_by(year, GEOID) %>%
@@ -939,9 +1090,6 @@ are seeing are due to chance, or are of evidence of an actual pattern).
 df_rdincome_total_change_tracts <- df_income_tracts %>%
     filter(variable != "Total") %>%
     select(year, GEOID, variable, estimate) %>%
-    mutate(
-        variable = factor(variable, ordered = TRUE, levels = income_var_labels)
-    ) %>%
     mutate(variable = fct_collapse(variable, 
         "Less than $50,000" = c(
             "Less than $10,000", "$10,000 to $14,999", 
@@ -958,6 +1106,9 @@ df_rdincome_total_change_tracts <- df_income_tracts %>%
         "$150,000 to $199,999" = c("$150,000 to $199,999"),
         "$200,000 or more" = c("$200,000 or more")
     )) %>%
+    mutate(
+        variable = factor(variable, ordered = TRUE, levels = income_var_labels)
+    ) %>%
     group_by(year, GEOID, variable) %>%
     summarize(estimate = sum(estimate)) %>%
     ungroup() %>%
@@ -980,8 +1131,8 @@ p1_total <- ggplot() +
     geom_sf(data = highway_arc, colour = "#009b00", fill = NA) +
     theme(legend.position = "bottom") +
     labs(
-        fill = "Change in proportion of households",
-        title = "Change in proportion of households in income band by tract",
+        fill = "Change in number of households",
+        title = "Change in number of households in income band by tract",
         subtitle = "(Data using 5-year estimates from the 2006-2010 ACS and 2015-2019 ACS)"
     ) +
     theme(legend.key.width = unit(2, 'cm'))
@@ -1001,8 +1152,8 @@ p2_total <- ggplot() +
     geom_sf(data = highway_arc, colour = "#009b00", fill = NA) +
     theme(legend.position = "bottom") +
     labs(
-        fill = "Change in proportion of households",
-        title = "Change in proportion of households in income band by tract",
+        fill = "Change in number of households",
+        title = "Change in number of households in income band by tract",
         subtitle = "(Data using 5-year estimates from the 2006-2010 ACS and 2015-2019 ACS)"
     ) +
     theme(legend.key.width = unit(2, 'cm'))
@@ -1011,16 +1162,172 @@ p2_total
 ggsave("income_changes_extreme_raw.pdf")
 ```
 
+```{r}
+p1_total + coord_sf(xlim = c(-84.53, -84.2), ylim = c(33.6, 33.95), expand = FALSE)
+ggsave("income_changes_all_itp.pdf")
+
+p2_total + coord_sf(xlim = c(-84.53, -84.2), ylim = c(33.6, 33.95), expand = FALSE) 
+ggsave("income_changes_extreme_itp.pdf")
+```
+
 # Migration patterns - income of people moving inside census tracts
 
-Questions I want to answer:
-- From the ACS data, get the median income of those who are moving
-inside different census tracts from within the state as compared to
-outside of the state for the ARC counties.
-- For the income plots above, do the same rebinning as what was
-done to create the migration plots.
-- Areas of interest from the extremes map:
+```{r}
+income_variables <- paste0("B07010_0", str_pad(1:66, 2, pad = "0"))
+
+income_variables_df <- v11 %>%
+    filter(name %in% income_variables) %>% 
+    select(name, label) %>% 
+    separate(
+        label, 
+        c('estimate', 'total', 'moved', 'income', 'band'), 
+        sep = "!!"
+    ) %>%
+    drop_na() %>%
+    select(name, moved, band) %>%
+    filter(moved != "Moved from abroad") %>%
+    mutate(
+        in_out_state = fct_collapse(
+            as_factor(moved),
+            "Stayed in-state" = c(
+                "Same house 1 year ago",
+                "Moved within same county",
+                "Moved from different county within same state",
+                "Moved from different state"
+            ),
+            "Moved from out-of-state" = c("Moved from different state")
+        ),
+        band = fct_collapse(
+            as_factor(band),
+            "$1 to $14,999" = c(
+                "$1 to $9,999 or loss", "$10,000 to $14,999"
+            ),
+            "$15,000 to $34,999" = c(
+                "$15,000 to $24,999", "$25,000 to $34,999"
+            ),
+            "$35,000 to $49,999" = "$35,000 to $49,999",
+            "$50,000 to $64,999" = "$50,000 to $64,999",
+            "$65,000 to $74,999" = "$65,000 to $74,999",
+            "$75,000 or more" = "$75,000 or more"
+        )
+    )
+
+df_income_in <- map_dfr(
+    years_acs1,
+    ~ get_acs(
+        geography = "county",
+        state = "GA",
+        variables = income_variables,
+        year = .x,
+        county = arc_counties,
+        survey = "acs1",
+        geometry = FALSE
+    ),
+    .id = "year") %>%
+    mutate(county = gsub("^(.*?),.*", "\\1", NAME)) %>%
+    select(-NAME) %>%
+    relocate(county, .after = GEOID)
+
+df_income_in %>%
+    left_join(income_variables_df, by = c("variable" = "name")) %>%
+    mutate(year = as.Date(paste(year, 1, 1, sep = "-"))) %>%
+    drop_na() %>%
+    group_by(year, in_out_state, band) %>% 
+    summarize(
+        estimate = sum(estimate),
+        moe = sqrt(sum(moe**2))
+    ) %>%
+    filter(in_out_state == "Moved from out-of-state") %>%
+    ggplot(aes(
+        x = year, y = estimate, ymin = estimate - moe,
+        ymax = estimate + moe, col = band, fill = band)
+    ) + geom_line() + 
+    geom_point() + 
+    geom_ribbon(alpha = 0.15, show.legend = FALSE) +
+    theme(legend.position = "bottom") + 
+    scale_x_date(date_labels = "%Y", date_breaks = "1 year") +
+    labs(
+        x = "Year", y = "Number of Individuals", 
+        col = "Individual Income",
+        title = "Distribution of income of individuals who moved into Atlanta from out of state",
+        subtitle = "Data from 1-year ACS from 2009 to 2019"
+    ) +
+    guides(fill = "none")
+
+ggsave("income_out_of_state.pdf")
+
+df_income_in_5yr <- map_dfr(
+    years_acs5,
+    ~ get_acs(
+        geography = "county",
+        state = "GA",
+        variables = income_variables,
+        year = .x,
+        county = arc_counties,
+        survey = "acs5",
+        geometry = FALSE
+    ),
+    .id = "year") %>%
+    mutate(county = gsub("^(.*?),.*", "\\1", NAME)) %>%
+    select(-NAME) %>%
+    relocate(county, .after = GEOID)
+
+df_income_in_5yr %>%
+    left_join(income_variables_df, by = c("variable" = "name")) %>%
+    mutate(year = as.Date(paste(year, 1, 1, sep = "-"))) %>%
+    drop_na() %>%
+    group_by(year, in_out_state, band) %>%
+    summarize(
+        estimate = sum(estimate),
+        moe = sqrt(sum(moe**2))
+    ) %>%
+    filter(in_out_state == "Moved from out-of-state") %>%
+    ggplot(aes(
+        x = year, y = estimate, ymin = estimate - moe,
+        ymax = estimate + moe, col = band, fill = band)
+    ) + geom_line() + 
+    geom_point() + 
+    geom_ribbon(alpha = 0.15, show.legend = FALSE) +
+    theme(legend.position = "bottom") + 
+    scale_x_date(date_labels = "%Y", date_breaks = "1 year") +
+    labs(
+        x = "Year", y = "Number of Individuals", 
+        col = "Individual Income",
+        title = "Distribution of income of individuals who moved into Atlanta from out of state",
+        subtitle = "Data from 5-year ACS from 2005-2009 to 2016-2020 (years not directly comparable)"
+    ) +
+    guides(fill = "none")
+```
+
+
+## Things to do still
+
+- Make an interactive map of the census tracts, just so I can
+easily get their locations to use it for pulling the shape
+and looking at the relevant satellite image (e.g, will
+use the tract's bounding box for pulling satellite imagery), 
+along with the number of households within that census tract (really
+need to have a mental image of this too)
+
+- From the satellite imagery, look at 
+areas of interest in 2010 as compared to as recently as possible,
+see what changes are there
     - The place in Forsyth County ()
     - The place "in the wedge"
     - The place at the intersection of DeKalb and Fulton
     - 11 o-clock in the perimeter
+
+- Extract the land change data from the land use dataset for
+each of the years 
+
+## Plans for the weekend:
+
+- Have both a line plot per year, and the bar plot showing
+    the change between 2009 and 2019
+
+- Plots for proportion of people moving: threshold the color
+changes between -0.15 and 0.15
+
+- Plots for total number of people moving: threshold the color
+changes between -500 and 500 households per tract
+
