@@ -1,5 +1,5 @@
 ---
-title: "ACS data on Atlanta and the wider metropoliton area"
+title: "ACS and satellite data on Atlanta and the wider metropoliton area"
 output:
   html_document:
     toc: true
@@ -14,11 +14,14 @@ output:
     fig_height: 8
     df_print: paged
     self_contained: false
+    code_folding: hide
 ---
 
 ```{r, include = FALSE}
 setwd("/mnt/c/Users/adavi/Documents/comp-journal/ajc-satellite/data-findings/")
 options(width = 1200)
+options(scipen = 100000000)
+options(tigris_use_cache = TRUE)
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
 library(tidyverse)
@@ -69,7 +72,8 @@ Throughout, we will frequently use ACS data; for ACS 1 year estimates, we use da
 from 2009 to 2019 (we note that [2020 data has not been released](
     https://www.census.gov/newsroom/press-releases/2021/changes-2020-acs-1-year.html
 ) as a result of the COVID pandemic adversely affecting data collection), and for
-ACS 5 year estimates, we use data from 2009 to 2020.
+ACS 5 year estimates, we use data in the range
+from the 2006-to-2010 estimates to the 2016-to-2020.
 
 ```{r}
 years_acs1 <- lst(
@@ -113,7 +117,7 @@ arc_counties_shp <- sf::st_read("../ga-counties/Counties_Georgia.shp") %>%
     filter(NAME10 %in% arc_counties) %>%
     select(NAME10, COUNTYFP10, geometry)
 
-arc_tracts_shp <- sf::st_read("../ga-tracts-2020/tl_2020_13_tract.shp") %>%
+arc_tracts_shp <- sf::st_read("../ga-tracts-2019/tl_2019_13_tract.shp") %>%
     filter(COUNTYFP %in% arc_counties_shp$COUNTYFP10)
 
 highway_arc <- st_intersection(highways, arc_counties_shp)
@@ -140,12 +144,8 @@ print(paste(
 ))
 ```
 
-As we can see, a small but non-zero number fall inside of this category, and
-so we will keep track of:
-
-- census tracts inside the perimeter (ITP),
-- census tracts on the perimeter (TP), and
-- census tracts outside the perimeter (OTP).
+As we can see, a small but non-zero number fall inside of this category;
+we will count these tracts as being inside of the perimeter.
 
 ```{r}
 arc_tracts_shp <- arc_tracts_shp %>% 
@@ -159,20 +159,21 @@ arc_tracts_shp <- arc_tracts_shp %>%
             geometry,
             st_transform(itp, crs = 4269), sparse = FALSE
         )[, 1],
-        otp = !tp & !itp
-    )
+        itp = tp | itp,
+        otp = !itp
+    ) %>% select(-tp)
 
 arc_tracts_shp %>% 
     st_drop_geometry() %>%
     summarize(
-        tp = sum(tp), itp = sum(itp), otp = sum(otp)
+        itp = sum(itp), otp = sum(otp)
     )
 ```
 
 ```{r}
 arc_tracts_shp2 <- arc_tracts_shp %>%
     pivot_longer(
-        cols = c(tp, itp, otp),
+        cols = c(itp, otp),
         names_to = "class",
         values_to = "in_class"
     ) %>%
@@ -257,6 +258,10 @@ error estimates) which lie in particular income bands across the ARC counties.
 
 ```{r}
 df_income_distribution
+write_csv(
+    df_income_distribution,
+    "data-files/income_distribution_by_year_county.csv"
+)
 ```
 
 ## How has the income distribution changed over the years across the Atlanta area?
@@ -269,6 +274,11 @@ and then take the square root. For this analysis, we look at all the counties
 which belong to the Altanta Regional Commission. 
 
 ### Looking at number of households
+
+From the plots below, we can see that the majority of the shift in the
+income distribution has been a large increase in the number of households
+earning between $150,000 and $199,999 and more than $200,000 (by almost 100,000 from 2009 to 2019 in both groups), with a
+similar drop of almost 100,000 households earning less than $50,000.
 
 ```{r}
 df_income_dist_summary <- df_income_distribution %>%
@@ -286,6 +296,10 @@ df_income_dist_summary <- df_income_distribution %>%
     filter(variable != "Total")
 
 df_income_dist_summary
+write_csv(
+    df_income_dist_summary,
+    "data-files/income_distribution_by_year.csv"
+)
 
 require(scales)
 
@@ -306,11 +320,13 @@ df_income_dist_summary %>%
     ggplot(aes(
         x = year, y = estimate, col = variable, fill = variable,
         ymin = estimate - moe, ymax = estimate + moe)
-    ) + geom_point() + geom_line() + geom_ribbon(alpha = 0.2) +
+    ) + geom_point(show.legend = FALSE) + geom_line() + 
+    geom_ribbon(alpha = 0.2, show.legend = FALSE) +
     labs(
         x = "Year", y = "Number of households",
         col = "Income band"
-    )
+    ) +
+    theme(legend.position = "bottom")
 ```
 
 ### Looking at the proportion of households
@@ -346,11 +362,10 @@ ggplot(df_income_prop_summary, aes(x = variable, y = estimate)) +
     ) + scale_y_continuous(labels = comma) + coord_flip()
 ```
 
-### Change between 2009 and 2019
+### Overall change between 2009 and 2019
 
-Looking at the number of households in each income band at 2009 and 2019, we can see
-that there has been a large increase in the number of households earning $100k or more,
-while the number of households earning less than $50k has mostly stayed constant. 
+Here we focus particularly on the change between the years in 2009 and
+2019.
 
 ```{r}
 cbPalette <- c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
@@ -376,17 +391,16 @@ df_income_dist_summary %>%
         subtitle = "Data from the 1-year ACS from 2009 and 2019"
     ) + scale_y_continuous(labels = comma) +
     coord_flip() + theme(legend.position = "none")
+
+ggsave("img-files/income_distribution_by_year.pdf")
 ```
 
-### Changes across counties over time
+### Looking at the changes in each county
 
 ```{r}
 df_income_distribution %>%
     select(year, county, variable, estimate, moe) %>%
     filter(variable != "Total") %>%
-    group_by(year, county) %>%
-    mutate(estimate = estimate / sum(estimate)) %>%
-    ungroup() %>%
     mutate(
         variable = factor(variable, ordered = TRUE, levels = income_var_labels)
     ) %>%
@@ -395,20 +409,21 @@ df_income_distribution %>%
     geom_col() + coord_flip() +
     labs(
         x = "Year", y = "Number of Households", fill = "Income Band",
-        title = "Distribution of Household Income across Counties and Year"
+        title = "Distribution of Household Income across Counties and Year",
+        subtitle = "Data from the 1-year ACS from 2009 to 2019"
     ) +
     theme(legend.position = "bottom")
 ```
 
 ## How has the income distribution changed ITP and OTP from 2009 to 2019?
 
-We note that between the 2009 5-year ACS estimates and the 2020 5-year ACS estimates,
-the number of census tracts has changed, and therefore we will compute for each census
-tract (in each year period) whether it was ITP, TP or OTP.
+From the plot below, we can see that the number of households inside
+of the perimeter earning less than $50,000 has decreased by approximately
+25000, whereas that outside the perimeter has stayed roughly constant. 
 
 ```{r, results = 'hide'}
 df_income_tracts <- map_dfr(
-    lst(2009, 2020),
+    lst(2009, 2019),
     ~ get_acs(
         geography = "tract",
         state = "GA",
@@ -426,39 +441,8 @@ df_income_tracts <- map_dfr(
     select(-NAME) %>%
     relocate(tract, county, .after = GEOID)
 
-df_tracts_peri_shp <- map_dfr(
-    lst(2009, 2020),
-    ~ get_acs(
-        geography = "tract",
-        state = "GA",
-        variables = "B19001_001",
-        year = .x,
-        county = arc_counties,
-        survey = "acs5",
-        geometry = TRUE
-    ),
-    .id = "year") %>% 
-    select(year, GEOID, geometry) %>%
-    mutate(
-        tp = st_intersects(
-            st_transform(st_boundary(itp), crs = 4269),
-            geometry, sparse = FALSE
-        )[1, ],
-        itp = st_within(
-            geometry,
-            st_transform(itp, crs = 4269), sparse = FALSE
-        )[, 1],
-        otp = !tp & !itp
-    ) %>%
-    pivot_longer(
-        cols = c(tp, itp, otp),
-        names_to = "class",
-        values_to = "in_class"
-    ) %>%
-    filter(in_class == TRUE)
-
 df_tracts <- map_dfr(
-    lst(2009, 2020),
+    lst(2009, 2019),
     ~ get_acs(
         geography = "tract",
         state = "GA",
@@ -479,21 +463,22 @@ df_tracts <- map_dfr(
             geometry,
             st_transform(itp, crs = 4269), sparse = FALSE
         )[, 1],
-        otp = !tp & !itp
-    ) %>%
+        itp = tp | itp,
+        otp = !itp
+    ) %>% select(-tp) %>%
     pivot_longer(
-        cols = c(tp, itp, otp),
+        cols = c(itp, otp),
         names_to = "class",
         values_to = "in_class"
     ) %>%
     filter(in_class == TRUE) %>%
     select(-in_class)
 
-df_tracts_peri <- df_tracts %>% st_drop_geometry()
+df_tracts_nogeom <- df_tracts %>% st_drop_geometry()
 
-df_income_tracts %>%
+df_income_by_perimeter <- df_income_tracts %>%
     filter(variable != "Total") %>%
-    left_join(df_tracts_peri) %>%
+    left_join(df_tracts_nogeom) %>%
     select(year, class, variable, estimate, moe) %>%
     mutate(variable = fct_collapse(variable, 
             "Less than $50,000" = c(
@@ -517,86 +502,61 @@ df_income_tracts %>%
         moe = sqrt(sum(moe**2))
     ) %>%
     mutate(
-        variable = factor(variable, ordered = TRUE, levels = income_var_labels)
-    ) %>%
-    group_by(year, class) %>%
-    mutate(
-        moe = moe / sum(estimate),
-        estimate = estimate / sum(estimate)
-    ) %>%
+        variable = factor(variable, 
+            ordered = TRUE, levels = income_var_labels
+        ),
+        class = recode_factor(factor(class), 
+            itp = "Inside the perimeter", otp = "Outside the perimeter"
+        )
+    )
+
+df_income_by_perimeter
+write_csv(
+    df_income_by_perimeter,
+    "data-files/income_distribution_inside_outside_perimeter.csv"
+)
+
+df_income_by_perimeter %>%
     ggplot(aes(x = variable, y = estimate, fill = year)) +
     geom_col(position = "dodge") + 
     geom_errorbar(
         aes(ymin = estimate - moe, ymax = estimate + moe),
         position = "dodge"
-    ) +
-    facet_grid(~ class) +
-    labs(x = "Income band", y = "Proportion of households") +
-    coord_flip()
-```
-
-Examining the three different classes, it appears that the main changes are that
-there are an increasing number of households in very high income brackets both
-inside and outside the perimeter, and that the number of households on the perimeter
-which were in the low income brackets has decreased over the past ten years by
-a considerable amount. (If anything, this seems like the most suprising thing
-I've found here.)
-
-```{r}
-df_income_tracts %>%
-    filter(variable != "Total") %>%
-    left_join(df_tracts_peri) %>%
-    select(year, class, variable, estimate, moe) %>%
-    mutate(variable = fct_collapse(variable, 
-            "Less than $50,000" = c(
-                "Less than $10,000", "$10,000 to $14,999", 
-                "$15,000 to $19,999", "$20,000 to $24,999",
-                "$25,000 to $29,999", "$30,000 to $34,999",
-                "$35,000 to $39,999", "$40,000 to $44,999",
-                "$45,000 to $49,999"
-            ),
-            "$50,000 to $74,999" = c("$50,000 to $59,999", "$60,000 to $74,999"),
-            "$75,000 to $99,999" = c("$75,000 to $99,999"),
-            "$100,000 to $149,999" = c(
-                "$100,000 to $124,999", "$125,000 to $149,999"
-            ),
-            "$150,000 to $199,999" = c("$150,000 to $199,999"),
-            "$200,000 or more" = c("$200,000 or more")
-        )) %>%
-    group_by(year, class, variable) %>%
-    summarize(
-        estimate = sum(estimate),
-        moe = sqrt(sum(moe**2))
-    ) %>% 
-    mutate(
-        variable = factor(variable, ordered = TRUE, levels = income_var_labels)
-    ) %>%
-    ggplot(aes(x = variable, y = estimate, fill = year)) +
-    geom_col(position = "dodge") + 
-    geom_errorbar(
-        aes(ymin = estimate - moe, ymax = estimate + moe),
-        position = "dodge"
+    ) + scale_fill_manual(values = cbPalette) +
+    geom_text(
+        aes(label = year, y = 10000), 
+        position = position_dodge(width = 1),
+        size = 5, hjust = 'left',
+        col = "#000000"
     ) +
     facet_grid(~ class, scales = "free") +
-    labs(x = "Income band", y = "Number of households") +
-    coord_flip()
+    labs(
+        x = "Income band", y = "Number of households", fill = "Year",
+        title = "Distribution of household income in the Atlanta inside and outside the perimeter",
+        subtitle = "Data from the 1-year ACS from 2009 and 2019"
+    ) +
+    coord_flip() + 
+    theme(legend.position = "none")
 ```
 
-## How has the income distribution changed across tracts over time?
+## How has the income distribution changed across census tracts over time?
 
 To compare the income distribution across tracts over time, for each census tract,
 we will look at the proportion of the population in the different income bands, and
 then compare these between 2010 and 2019. (These time periods were chosen so that
 there are no issues in switching between different census tracts.) To do so, we 
-will compute the total variation distance (up to a scalar) between the two distributions;
+will compute the total variation distance between the two distributions;
 formally, if we have $K$ different possible values, and we have two sets of proportions
 labelled $p(i)$ and $q(i)$ (where $i$ can take on $1$, $2$, ..., or $K$), then we compute
 the value
-$$ |p(1) - q(1)| + |p(2) - q(2)| + \cdots + |p(K) - q(K)|, $$
-and use this as a measure of how different $p$ and $q$ are. To try and observe what
+$$ \frac{1}{2} \times \Big( |p(1) - q(1)| + |p(2) - q(2)| + \cdots + |p(K) - q(K)| \Big), $$
+and use this as a measure of how different $p$ and $q$ are. If this distance is zero,
+then the two distributions are identical; the closer the distance is to one, the greater
+the difference between the distributions. To try and observe what
 is happening in relation to some other geographical structures, the major highways
-beyond that of the interstate have also been added to the plots below.
-(Apologies for the color blind unfriendly palette.)
+beyond that of the interstate have also been added to the plots below
+as dashed black lines (with the county boundaries given as solid black
+lines, and the census tract boundaries as solid grey lines).
 
 ```{r, results = 'hide'}
 df_income_tracts <- map_dfr(
@@ -630,7 +590,26 @@ df_tracts <- map_dfr(
         geometry = TRUE
     ),
     .id = "year") %>% 
-    select(GEOID, geometry)
+    select(GEOID, geometry) %>%
+    mutate(
+        tp = st_intersects(
+            st_transform(st_boundary(itp), crs = 4269),
+            geometry, sparse = FALSE
+        )[1, ],
+        itp = st_within(
+            geometry,
+            st_transform(itp, crs = 4269), sparse = FALSE
+        )[, 1],
+        itp = tp | itp,
+        otp = !itp
+    ) %>% select(-tp) %>%
+    pivot_longer(
+        cols = c(itp, otp),
+        names_to = "class",
+        values_to = "in_class"
+    ) %>%
+    filter(in_class == TRUE) %>%
+    select(-in_class)
 
 df_total_households_tracts <- df_income_tracts %>%
     filter(variable == 'Total') %>% 
@@ -674,7 +653,7 @@ df_income_change_tracts <- df_income_change_long %>%
         values_from = estimate
     ) %>% 
     mutate(
-        diff = abs(estimate_2010 - estimate_2019)
+        diff = abs(estimate_2019 - estimate_2010)
     ) %>%
     group_by(GEOID) %>%
     summarize(income_dist_change = 0.5*sum(diff)) %>%
@@ -695,7 +674,8 @@ df_income_change_overall <- df_income_change_long %>%
 
 plot(
     df_total_households_tracts2$estimate, df_income_change_tracts$income_dist_change,
-    xlab = "Number of households in census tract",
+    col = factor(df_tracts$class),
+    xlab = "Number of households in census tract in 2019",
     ylab = "Total variation of income distribution change in census tract",
     main = "Number of households vs income change across census tracts",
     sub = "(Horizontal red line corresponds to level of income change across all Atlanta)"
@@ -703,9 +683,13 @@ plot(
 abline(h = as.numeric(df_income_change_overall), col = "red", lwd = 3)
 
 df_income_change_tracts %>% 
+    mutate(
+        class = recode_factor(factor(class), 
+            itp = "Inside the perimeter", otp = "Outside the perimeter"
+    )) %>%
     select(-geometry) %>%
-    ggplot(aes(x = income_dist_change)) +
-    geom_histogram() +
+    ggplot(aes(x = income_dist_change, after_stat(density))) +
+    geom_histogram() + facet_wrap( ~ class) +
     geom_vline(
         xintercept = as.numeric(df_income_change_overall),
         col = "red"
@@ -713,18 +697,21 @@ df_income_change_tracts %>%
     labs(
         x = "Total variation distance between income distributions in 2010 and 2019",
         title = "Histogram of total variation distances between income distributions across census tracts",  
-        y = "Number of census tracts", 
-        subtitle = "(Vertical red line represents the overall distribution change across Atlanta)"
+        y = "Density of census tracts in class", 
+        subtitle = "(Vertical red line represents the overall distribution change across Atlanta, vertical blue line represents this plus the IQR overall all"
     )
 
 ggplot() +
     geom_sf(
-        data = df_income_change_tracts, 
+        data = df_income_change_tracts %>%
+            mutate(income_dist_change = pmin(income_dist_change, 0.31)), 
         aes(geometry = geometry, fill = income_dist_change),
         colour = "grey"
-    ) + scale_fill_viridis(option = "magma") +
+    ) + scale_fill_viridis(
+        labels = c(0, 0.1, 0.2, "0.3+")
+    ) +
     geom_sf(data = arc_counties_shp, colour = "black", fill = NA) +
-    geom_sf(data = highway_arc, colour = "green", fill = NA) +
+    geom_sf(data = highway_arc, colour = "#000000", lty = 3, fill = NA) +
     theme(legend.position = "bottom") +
     labs(
         fill = "Total variation of income distributions",
@@ -741,41 +728,6 @@ This seems pretty abstract, and so instead we'll look at some "extreme groups":
 
 and see where the numbers of these households/proportions have been 
 increasing and decreasing in number the largest. 
-
-```{r, include = FALSE}
-library(scales)
-symlog_trans <- function(base = 10, thr = 1, scale = 1){
-  trans <- function(x)
-    ifelse(abs(x) < thr, x, sign(x) * 
-             (thr + scale * suppressWarnings(log(sign(x) * x / thr, base))))
-
-  inv <- function(x)
-    ifelse(abs(x) < thr, x, sign(x) * 
-             base^((sign(x) * x - thr) / scale) * thr)
-
-  breaks <- function(x){
-    sgn <- sign(x[which.max(abs(x))])
-    if(all(abs(x) < thr))
-      pretty_breaks()(x)
-    else if(prod(x) >= 0){
-      if(min(abs(x)) < thr)
-        sgn * unique(c(pretty_breaks()(c(min(abs(x)), thr)),
-                       log_breaks(base)(c(max(abs(x)), thr))))
-      else
-        sgn * log_breaks(base)(sgn * x)
-    } else {
-      if(min(abs(x)) < thr)
-        unique(c(sgn * log_breaks()(c(max(abs(x)), thr)),
-                 pretty_breaks()(c(sgn * thr, x[which.min(abs(x))]))))
-      else
-        unique(c(-log_breaks(base)(c(thr, -x[1])),
-                 pretty_breaks()(c(-thr, thr)),
-                 log_breaks(base)(c(thr, x[2]))))
-    }
-  }
-  trans_new(paste("symlog", thr, base, scale, sep = "-"), trans, inv, breaks)
-}
-```
 
 ```{r}
 df_rdincome_tracts <- df_income_tracts %>%
@@ -880,22 +832,9 @@ df_rdincome_change_tracts %>%
         subtitle = "(Data from the 5-year ACS 2006-2010 and 2015-2019)"
     )
 
-ggplot() +
-    geom_sf(
-        data = df_rdincome_change_tracts,
-        aes(geometry = geometry, fill = change),
-        colour = "grey", lwd = 0.25
-    ) + scale_fill_viridis(option = "turbo") +
-    facet_wrap(~ variable) + 
-    geom_sf(data = arc_counties_shp, colour = "black", fill = NA) +
-    geom_sf(data = highway_arc, colour = "#009b00", fill = NA) +
-    theme(legend.position = "bottom") +
-    labs(
-        fill = "Net change in households",
-        title = "Change in number of households by income band and tract",
-        subtitle = "(Data using 5-year estimates from the 2006-2010 ACS and 2015-2019 ACS)"
-    ) +
-    theme(legend.key.width = unit(2, 'cm'))
+pminmax <- function(x, min_val, max_val) {
+    return(pmin(pmax(x, min_val), max_val))
+}
 ```
 
 ```{r}
@@ -1002,13 +941,17 @@ df_rdincome_prop_change_tracts %>%
 
 p1 <- ggplot() +
     geom_sf(
-        data = df_rdincome_prop_change_tracts,
+        data = df_rdincome_prop_change_tracts %>% 
+            mutate(change = pminmax(change, -0.2, 0.2)),
         aes(geometry = geometry, fill = change),
         colour = "grey", lwd = 0.25
-    ) + scale_fill_viridis(option = "turbo") +
+    ) + scale_fill_viridis(
+        option = "turbo",
+        labels = c("<= -0.2", -0.1, 0, 0.1, "0.2 <=")
+    ) +
     facet_wrap(~ variable) + 
     geom_sf(data = arc_counties_shp, colour = "black", fill = NA) +
-    geom_sf(data = highway_arc, colour = "#009b00", fill = NA) +
+    geom_sf(data = highway_arc, colour = "black", lty = 3, fill = NA) +
     theme(legend.position = "bottom") +
     labs(
         fill = "Change in proportion of households",
@@ -1018,18 +961,23 @@ p1 <- ggplot() +
     theme(legend.key.width = unit(2, 'cm'))
 
 p1
-ggsave("income_changes_all.pdf")
+ggsave("img-files/income_changes_tract_income_prop.pdf")
 
 p2 <- ggplot() +
     geom_sf(
         data = df_rdincome_prop_change_tracts %>%
+            mutate(change = pminmax(change, -0.2, 0.2)) %>%
             filter(variable %in% c("Less than $50,000", "$200,000 or more")),
         aes(geometry = geometry, fill = change),
         colour = "grey", lwd = 0.25
-    ) + scale_fill_viridis(option = "turbo") +
+    ) + 
+    scale_fill_viridis(
+        option = "turbo", 
+        labels = c("<= -0.2", -0.1, 0, 0.1, "0.2 <=")
+    ) +
     facet_wrap(~ variable) + 
     geom_sf(data = arc_counties_shp, colour = "black", fill = NA) +
-    geom_sf(data = highway_arc, colour = "#009b00", fill = NA) +
+    geom_sf(data = highway_arc, colour = "black", lty = 3, fill = NA) +
     theme(legend.position = "bottom") +
     labs(
         fill = "Change in proportion of households",
@@ -1039,36 +987,7 @@ p2 <- ggplot() +
     theme(legend.key.width = unit(2, 'cm'))
 
 p2
-ggsave("income_changes_extreme.pdf")
-```
-
-```{r, include = FALSE, eval = FALSE}
-tdf <- df_rdincome_prop_change_tracts %>%
-    select(GEOID, change, variable) %>%
-    filter(variable %in% c("Less than $50,000", "$200,000 or more")) %>%
-    pivot_wider(
-        names_from = variable,
-        values_from = change
-    ) %>%
-    left_join(
-        df_tracts_peri_shp %>% st_drop_geometry() %>% select(GEOID, class)
-    ) %>%
-    filter(`Less than $50,000` < 0, class == 'otp') %>%
-    select(-GEOID, -class)
-
-cor.test(tdf$`Less than $50,000`, tdf$`$200,000 or more`, method = "spearman")
-
-df_rdincome_prop_change_tracts %>%
-    select(GEOID, change, variable) %>%
-    filter(variable %in% c("Less than $50,000", "$200,000 or more")) %>%
-    left_join(
-        df_tracts_peri_shp %>% st_drop_geometry() %>% select(GEOID, class)
-    ) %>%
-    ggplot(aes(x = change, fill = class)) + 
-    geom_histogram() +
-    facet_grid(variable ~ class)
-
-ggsave("income_changes_histogram.pdf")
+ggsave("img-files/income_changes_tract_income_prop_highlow.pdf")
 ```
 
 Let's zoom inside the perimeter to see what is happening here
@@ -1076,10 +995,10 @@ a bit more carefully.
 
 ```{r}
 p1 + coord_sf(xlim = c(-84.53, -84.2), ylim = c(33.6, 33.95), expand = FALSE)
-ggsave("income_changes_all_itp.pdf")
+ggsave("img-files/income_changes_tract_income_prop_itp.pdf")
 
 p2 + coord_sf(xlim = c(-84.53, -84.2), ylim = c(33.6, 33.95), expand = FALSE) 
-ggsave("income_changes_extreme_itp.pdf")
+ggsave("img-files/income_changes_tract_income_prop_highlow_itp.pdf")
 ```
 
 Let's also just look at the actual numbers of households, rather than the
@@ -1089,7 +1008,7 @@ are seeing are due to chance, or are of evidence of an actual pattern).
 ```{r}
 df_rdincome_total_change_tracts <- df_income_tracts %>%
     filter(variable != "Total") %>%
-    select(year, GEOID, variable, estimate) %>%
+    select(year, GEOID, variable, estimate, moe) %>%
     mutate(variable = fct_collapse(variable, 
         "Less than $50,000" = c(
             "Less than $10,000", "$10,000 to $14,999", 
@@ -1110,25 +1029,35 @@ df_rdincome_total_change_tracts <- df_income_tracts %>%
         variable = factor(variable, ordered = TRUE, levels = income_var_labels)
     ) %>%
     group_by(year, GEOID, variable) %>%
-    summarize(estimate = sum(estimate)) %>%
+    summarize(
+        estimate = sum(estimate),
+        moe = sqrt(sum(moe**2))
+    ) %>%
     ungroup() %>%
     pivot_wider(
         names_from = "year",
-        names_prefix = "estimate_",
-        values_from = "estimate"
+        values_from = c("estimate", "moe")
     ) %>%
-    mutate(change = estimate_2019 - estimate_2010) %>%
+    mutate(
+        change = estimate_2019 - estimate_2010,
+        ratio = estimate_2019 / estimate_2010,
+        log_ratio_moe = sqrt((moe_2019/estimate_2019)**2 + (moe_2010/estimate_2010)**2)
+    ) %>%
     left_join(df_tracts)
 
 p1_total <- ggplot() +
     geom_sf(
-        data = df_rdincome_total_change_tracts,
+        data = df_rdincome_total_change_tracts %>%
+        mutate(change = pminmax(change, -500, 500)),
         aes(geometry = geometry, fill = change),
         colour = "grey", lwd = 0.25
-    ) + scale_fill_viridis(option = "turbo") +
+    ) + scale_fill_viridis(
+        option = "turbo",
+        labels = c("<= -500", -250, 0, 250, "500 <=")
+    ) +
     facet_wrap(~ variable) + 
     geom_sf(data = arc_counties_shp, colour = "black", fill = NA) +
-    geom_sf(data = highway_arc, colour = "#009b00", fill = NA) +
+    geom_sf(data = highway_arc, colour = "black", lty = 3, fill = NA) +
     theme(legend.position = "bottom") +
     labs(
         fill = "Change in number of households",
@@ -1138,18 +1067,22 @@ p1_total <- ggplot() +
     theme(legend.key.width = unit(2, 'cm'))
 
 p1_total
-ggsave("income_changes_all_raw.pdf")
+ggsave("img-files/income_changes_tract_income_net_change.pdf")
 
 p2_total <- ggplot() +
     geom_sf(
         data = df_rdincome_total_change_tracts %>%
+            mutate(change = pminmax(change, -500, 500)) %>%
             filter(variable %in% c("Less than $50,000", "$200,000 or more")),
         aes(geometry = geometry, fill = change),
         colour = "grey", lwd = 0.25
-    ) + scale_fill_viridis(option = "turbo") +
+    ) + scale_fill_viridis(
+        option = "turbo",
+        labels = c("<= -500", -250, 0, 250, "500 <=")
+    ) +
     facet_wrap(~ variable) + 
     geom_sf(data = arc_counties_shp, colour = "black", fill = NA) +
-    geom_sf(data = highway_arc, colour = "#009b00", fill = NA) +
+    geom_sf(data = highway_arc, colour = "black", lty = 3, fill = NA) +
     theme(legend.position = "bottom") +
     labs(
         fill = "Change in number of households",
@@ -1159,15 +1092,67 @@ p2_total <- ggplot() +
     theme(legend.key.width = unit(2, 'cm'))
 
 p2_total
-ggsave("income_changes_extreme_raw.pdf")
+ggsave("img-files/income_changes_tract_income_net_change_highlow.pdf")
 ```
 
 ```{r}
 p1_total + coord_sf(xlim = c(-84.53, -84.2), ylim = c(33.6, 33.95), expand = FALSE)
-ggsave("income_changes_all_itp.pdf")
+ggsave("img-files/income_changes_tract_income_net_change_itp.pdf")
 
 p2_total + coord_sf(xlim = c(-84.53, -84.2), ylim = c(33.6, 33.95), expand = FALSE) 
-ggsave("income_changes_extreme_itp.pdf")
+ggsave("img-files/income_changes_tract_income_net_change_highlow_itp.pdf")
+```
+
+## Correlations between income changes in tracts
+
+```{r}
+df_rdincome_tc_corr <- df_income_tracts %>%
+    filter(variable != "Total") %>%
+    select(year, GEOID, variable, estimate) %>%
+    mutate(variable = fct_collapse(variable,
+        "band_1" = c(
+            "Less than $10,000", "$10,000 to $14,999", 
+            "$15,000 to $19,999", "$20,000 to $24,999",
+            "$25,000 to $29,999", "$30,000 to $34,999",
+            "$35,000 to $39,999", "$40,000 to $44,999",
+            "$45,000 to $49,999", "$50,000 to $59,999",
+            "$60,000 to $74,999"
+        ),
+        "band_2" = c("$75,000 to $99,999"),
+        "band_3" = c(
+            "$100,000 to $124,999", "$125,000 to $149,999"
+        ),
+        "band_4" = c("$150,000 to $199,999", "$200,000 or more")
+    )) %>%
+    mutate(
+        variable = factor(
+            variable, ordered = TRUE, 
+            levels = c(
+                "band_1", "band_2", "band_3", "band_4"
+            )
+        )
+    ) %>%
+    group_by(year, GEOID, variable) %>%
+    summarize(estimate = sum(estimate)) %>%
+    ungroup() %>%
+    pivot_wider(
+        names_from = "year",
+        names_prefix = "estimate_",
+        values_from = "estimate"
+    ) %>%
+    mutate(change = estimate_2019 - estimate_2010)
+
+dft <- df_rdincome_tc_corr %>%
+    select(GEOID, variable, change) %>%
+    pivot_wider(names_from = variable, values_from = change) %>%
+    left_join(
+        df_tracts %>% 
+            st_drop_geometry() %>%
+            select(GEOID, class)
+    )
+
+ggplot(dft, aes(x = band_1 + band_2, y = band_4)) +
+    geom_point()
 ```
 
 # Migration patterns - income of people moving inside census tracts
@@ -1189,8 +1174,8 @@ income_variables_df <- v11 %>%
     mutate(
         in_out_state = fct_collapse(
             as_factor(moved),
-            "Stayed in-state" = c(
-                "Same house 1 year ago",
+            "Same house 1 year ago" = "Same house 1 year ago",
+            "Moved in-state" = c(
                 "Moved within same county",
                 "Moved from different county within same state",
                 "Moved from different state"
@@ -1206,8 +1191,9 @@ income_variables_df <- v11 %>%
                 "$15,000 to $24,999", "$25,000 to $34,999"
             ),
             "$35,000 to $49,999" = "$35,000 to $49,999",
-            "$50,000 to $64,999" = "$50,000 to $64,999",
-            "$65,000 to $74,999" = "$65,000 to $74,999",
+            "$50,000 to $74,999" = c(
+                "$50,000 to $64,999", "$65,000 to $74,999"
+            ),
             "$75,000 or more" = "$75,000 or more"
         )
     )
@@ -1237,24 +1223,25 @@ df_income_in %>%
         estimate = sum(estimate),
         moe = sqrt(sum(moe**2))
     ) %>%
-    filter(in_out_state == "Moved from out-of-state") %>%
+    filter(str_detect(in_out_state, "Moved")) %>%
     ggplot(aes(
         x = year, y = estimate, ymin = estimate - moe,
         ymax = estimate + moe, col = band, fill = band)
-    ) + geom_line() + 
-    geom_point() + 
+    ) + geom_line() +
+    geom_point() +
     geom_ribbon(alpha = 0.15, show.legend = FALSE) +
-    theme(legend.position = "bottom") + 
+    theme(legend.position = "bottom") +
+    facet_wrap( ~ in_out_state, scales = "free") +
     scale_x_date(date_labels = "%Y", date_breaks = "1 year") +
     labs(
-        x = "Year", y = "Number of Individuals", 
+        x = "Year", y = "Number of Individuals",
         col = "Individual Income",
         title = "Distribution of income of individuals who moved into Atlanta from out of state",
         subtitle = "Data from 1-year ACS from 2009 to 2019"
     ) +
     guides(fill = "none")
 
-ggsave("income_out_of_state.pdf")
+ggsave("img-files/income_out_of_state.pdf")
 
 df_income_in_5yr <- map_dfr(
     years_acs5,
@@ -1299,35 +1286,519 @@ df_income_in_5yr %>%
     guides(fill = "none")
 ```
 
+## Are individuals being forced out?
 
-## Things to do still
+Before doing anything with the data, we note that there is nothing casual we
+can say here. However, we can describe associations between different income groups;
+here, we investigate whether there is a general association between the change
+in those earning less than $75,000 a year, and those earning $200,000 or more in an area.
 
-- Make an interactive map of the census tracts, just so I can
-easily get their locations to use it for pulling the shape
-and looking at the relevant satellite image (e.g, will
-use the tract's bounding box for pulling satellite imagery), 
-along with the number of households within that census tract (really
-need to have a mental image of this too)
+```{r}
+df_income_change_corr <- df_rdincome_total_change_tracts %>% 
+    select(GEOID, variable, ratio, log_ratio_moe) %>%
+    filter(variable %in% c("Less than $50,000", "$200,000 or more")) %>%
+    mutate(variable = fct_recode(
+        variable, "lt_50k" = "Less than $50,000", "gt_200k" = "$200,000 or more"
+    )) %>%
+    pivot_wider(
+        names_from = variable,
+        values_from = c("ratio", "log_ratio_moe")
+    ) %>%
+    filter(
+        ratio_gt_200k > 0, ratio_gt_200k < Inf,
+        log_ratio_moe_lt_50k < 5, log_ratio_moe_gt_200k < 5
+    )
+
+dr <- deming(
+    log(ratio_gt_200k) ~ log(ratio_lt_50k), data = df_income_change_corr,
+    xstd = log_ratio_moe_lt_50k, ystd = log_ratio_moe_gt_200k
+)
+dr
+
+dr2 <- deming(
+    log(ratio_lt_50k) ~ log(ratio_gt_200k), data = df_income_change_corr,
+    ystd = log_ratio_moe_lt_50k, xstd = log_ratio_moe_gt_200k
+)
+dr2
+```
+
+## Change in number of households earning less than $75,000 in Atlanta and the surrounding area 
+
+In order to try and examine more carefully where people in the lower
+income band are moving, we look at the change in households over the
+entire Atlanta Metropoliton Statistical Area in the $75,000 or less
+income bracket. We note that this roughly corresponds to
+the [current living wage](https://livingwage.mit.edu/metros/12060)) estimate for a household in Atlanta, assuming a
+two adult household with two children and one adult working.
+
+```{r}
+
+```
+
+
+# How has the amount of rent changed in the Atlanta area from 2010 to 2020?
+
+From the data and graph below, we can see that prior to the recession,
+the majority of the amount paid per month in rent was less than $1,249
+a month, whereas now a considerable number of units require at least
+this much to pay. That said, this is not accounting directly
+for changes in inflation; however, when looking at the median and lower
+quartile monthly rent, these are typically around 20% and 10% higher
+than what they were ten years ago, even when adjusting for inflation.
+The same occurs in most of the counties for the upper quartile of
+monthly rent.
+
+(Note: the income adjustment factor between 2010 and 2020 is 1.19
+according to the [Consumer Price Index](https://www.bls.gov/cpi/research-series/r-cpi-u-rs-home.htm))
+
+```{r}
+v20 <- load_variables(2020, "acs5", cache = TRUE)
+
+rent_variables_2010 <- paste0("B25063_0", str_pad(1:24, 2, pad = "0"))
+
+rent_var_labels_2010 <- v11 %>%
+    filter(name %in% rent_variables_2010) %>%
+    select(label) %>% as_vector()
+
+rent_var_labels_2010 <- sapply(
+    str_split(rent_var_labels_2010, "!!"), tail, 1
+)
+
+rent_var_list_2010 <- setNames(
+    as.list(rent_variables_2010), rent_var_labels_2010
+)
+
+df_rent_distribution_2010 <- map_dfr(
+    lst(2010),
+    ~ get_acs(
+        geography = "county",
+        state = "GA",
+        variables = rent_var_list_2010,
+        year = .x,
+        county = arc_counties,
+        survey = "acs5",
+        geometry = FALSE
+    ),
+    .id = "year") %>%
+    mutate(
+        county = gsub("^(.*?),.*", "\\1", NAME)
+    ) %>% select(-NAME) %>% relocate(county, .after = GEOID)
+
+rent_variables_2020 <- paste0("B25063_0", str_pad(1:27, 2, pad = "0"))
+
+rent_var_labels_2020 <- v20 %>%
+    filter(name %in% rent_variables_2020) %>%
+    select(label) %>% as_vector()
+
+rent_var_labels_2020 <- sapply(
+    str_split(rent_var_labels_2020, "!!"), tail, 1
+)
+
+rent_var_list_2020 <- setNames(
+    as.list(rent_variables_2020), rent_var_labels_2020
+)
+
+df_rent_distribution_2020 <- map_dfr(
+    lst(2020),
+    ~ get_acs(
+        geography = "county",
+        state = "GA",
+        variables = rent_var_list_2020,
+        year = .x,
+        county = arc_counties,
+        survey = "acs5",
+        geometry = FALSE
+    ),
+    .id = "year") %>%
+    mutate(
+        county = gsub("^(.*?),.*", "\\1", NAME)
+    ) %>% select(-NAME) %>% relocate(county, .after = GEOID)
+
+df_rent_distribution <- bind_rows(
+    df_rent_distribution_2010, df_rent_distribution_2020
+)
+
+collapsed_factors <- c(
+    "Less than $750", "$750 to $999", "$1,000 to $1,249",
+    "$1,250 to $1,499", "$1,500 to $1,999", "$2,000 or more"
+)
+
+df_rent_dist_summary <- df_rent_distribution %>% 
+    mutate(variable = fct_collapse(
+    variable,
+    "Less than $750" = c(
+        "Less than $100", "$100 to $149", "$150 to $199", "$200 to $249",
+        "$250 to $299", "$300 to $349", "$350 to $399",
+        "$400 to $449", "$450 to $499", "$500 to $549",
+        "$550 to $599", "$600 to $649", "$650 to $699",
+        "$700 to $749"
+    ),
+    "$750 to $999" = c(
+        "$750 to $799", "$800 to $899", "$900 to $999"
+    ),
+    "$1,000 to $1,249" = c(
+        "$1,000 to $1,249"
+    ),
+    "$1,250 to $1,499" = c(
+        "$1,250 to $1,499"
+    ),
+    "$1,500 to $1,999" = c(
+        "$1,500 to $1,999"
+    ),
+    "$2,000 or more" = c(
+        "$2,000 or more", "$2,000 to $2,499",
+        "$2,500 to $2,999", "$3,000 to $3,499",
+        "$3,500 or more"
+    )
+)) %>% group_by(year, variable) %>%
+    summarize(
+        estimate = sum(estimate), moe = sqrt(sum(moe**2))
+    ) %>%
+    filter(variable %in% collapsed_factors) %>%
+    mutate(
+        variable = factor(variable, 
+            ordered = "true", levels = collapsed_factors)
+        )
+
+df_rent_dist_summary
+
+df_rent_dist_summary %>%
+    ggplot(aes(x = variable, y = estimate, fill = year)) +
+    geom_col(position = "dodge") + 
+    geom_errorbar(
+        aes(ymin = estimate - moe, ymax = estimate + moe),
+        position = "dodge"
+    ) + scale_fill_manual(values = cbPalette) +
+    geom_text(
+        aes(label = year, y = 10000), 
+        position = position_dodge(width = 1),
+        size = 5, hjust = 'left',
+        col = "black"
+    ) +
+    labs(
+        x = "Gross Rent", y = "Number of renter-occupied housing units", fill = "Year",
+        title = "Distribution of monthly gross rent in the Atlanta area from 2010 to 2019",
+        subtitle = "Data from the 5-year ACS from 2006-2010 to 2016-2020"
+    ) +
+    coord_flip() + 
+    theme(legend.position = "none")
+
+df_rent_lower_quartile <- map_dfr(
+    lst(2010, 2020),
+    ~ get_acs(
+        geography = "county",
+        state = "GA",
+        variables = "B25057_001",
+        year = .x,
+        county = arc_counties,
+        survey = "acs5",
+        geometry = FALSE
+    ),
+    .id = "year") %>%
+    mutate(
+        county = gsub("^(.*?),.*", "\\1", NAME)
+    ) %>% select(-NAME) %>% relocate(county, .after = GEOID) %>%
+    select(county, year, estimate) %>%
+    pivot_wider(
+        names_from = year, values_from = estimate,
+        names_prefix = "rent_"
+    ) %>%
+    mutate(
+        rent_2010_in_2020_dollars = rent_2010 * 1.19,
+        ratio_adjusting_for_inflation = rent_2020 / (rent_2010 * 1.19)
+    )
+
+df_rent_lower_quartile
+
+df_rent_median_quartile <- map_dfr(
+    lst(2010, 2020),
+    ~ get_acs(
+        geography = "county",
+        state = "GA",
+        variables = "B25058_001",
+        year = .x,
+        county = arc_counties,
+        survey = "acs5",
+        geometry = FALSE
+    ),
+    .id = "year") %>%
+    mutate(
+        county = gsub("^(.*?),.*", "\\1", NAME)
+    ) %>% select(-NAME) %>% relocate(county, .after = GEOID) %>%
+    select(county, year, estimate) %>%
+    pivot_wider(
+        names_from = year, values_from = estimate,
+        names_prefix = "rent_"
+    ) %>%
+    mutate(
+        rent_2010_in_2020_dollars = rent_2010 * 1.19,
+        ratio_adjusting_for_inflation = rent_2020 / (rent_2010 * 1.19)
+    )
+
+df_rent_median_quartile
+
+df_rent_upper_quartile <- map_dfr(
+    lst(2010, 2020),
+    ~ get_acs(
+        geography = "county",
+        state = "GA",
+        variables = "B25059_001",
+        year = .x,
+        county = arc_counties,
+        survey = "acs5",
+        geometry = FALSE
+    ),
+    .id = "year") %>%
+    mutate(
+        county = gsub("^(.*?),.*", "\\1", NAME)
+    ) %>% select(-NAME) %>% relocate(county, .after = GEOID) %>%
+    select(county, year, estimate) %>%
+    pivot_wider(
+        names_from = year, values_from = estimate,
+        names_prefix = "rent_"
+    ) %>%
+    mutate(
+        rent_2010_in_2020_dollars = rent_2010 * 1.19,
+        ratio_adjusting_for_inflation = rent_2020 / (rent_2010 * 1.19)
+    )
+
+df_rent_upper_quartile
+```
+
+## Correlation with change in number of households in income brackets
+
+Hmm, suprisingly there doesn't appear to be any correlation between the change 
+in the number of households in the lower income bracket as compared to the change
+in rent in a particular census tract. To be honest, I find this pretty surprising...
+
+```{r}
+df_rent_lower_quartile_tracts <- map_dfr(
+    lst(2010, 2019),
+    ~ get_acs(
+        geography = "tract",
+        state = "GA",
+        variables = "B25057_001",
+        year = .x,
+        county = arc_counties,
+        survey = "acs5",
+        geometry = FALSE
+    ),
+    .id = "year") %>% mutate(
+        tract = gsub("^(.*?),.*", "\\1", NAME),
+        county = gsub("^(.*?), (.*?),.*", "\\2", NAME)
+    ) %>% 
+    select(-NAME) %>%
+    relocate(tract, county, .after = GEOID) %>%
+    filter(tract != "Census Tract 9800") %>%
+    select(GEOID, year, estimate) %>%
+    pivot_wider(
+        names_from = year, values_from = estimate,
+        names_prefix = "rent_"
+    ) %>%
+    mutate(
+        rent_2010_in_2019_dollars = rent_2010 * 1.175,
+        ratio_adjusting_for_inflation = rent_2019 / (rent_2010 * 1.175)
+    )
+
+df_ratio_change_tracts <- df_rdincome_total_change_tracts %>%
+    select(-geometry) %>%
+    filter(variable %in% c("Less than $50,000")) %>%
+    select(GEOID, variable, estimate_2010, estimate_2019, class) %>%
+    group_by(GEOID) %>%
+    mutate(
+        estimate_2010 = sum(estimate_2010),
+        estimate_2019 = sum(estimate_2019)
+    ) %>% ungroup() %>% unique() %>%
+    mutate(
+        pop_ratio = estimate_2019 / estimate_2010
+    )
+
+df_tract_changes <- left_join(
+    df_rent_upper_quartile_tracts, df_ratio_change_tracts
+)
+
+df_tract_changes %>% 
+    ggplot(aes(x = ratio_adjusting_for_inflation, y = pop_ratio, col = class)) +
+    scale_x_log10() + scale_y_log10() +
+    geom_point()
+
+cor.test(
+    df_tract_changes$ratio_adjusting_for_inflation,
+    df_tract_changes$pop_ratio,
+    use = "complete.obs"
+)
+```
+
+However, if we look at
+- the ratio of households earning less than $50,000 a year between 2019 and 2010, and
+- the number of renters paying less than $1,000 a month in rent between 2019 and 2010
+across the tracts, we see that there is a statistically significant relationship
+between the two ratios.
+
+In performing this calculation, we removed census tracts for which the
+estimated number of households paying less than $1,000 in rent was zero in
+either of the time periods. We also removed ratios whose standard errors were too
+high. To do so, we note that it is usually assumed that, across different periods
+of time, variables are independent, and are approximately Normally distributed
+with mean given by the estimate, and standard error given by the [margin of error
+divided by 1.645](https://www.census.gov/programs-surveys/acs/guidance/training-presentations/acs-moe.html). In general, if $X \sim N(\mu_X, \sigma_X^2)$
+and $Y \sim N(\mu_Y, \sigma_Y^2)$ are independent, then we can approximate
+the standard error of $\log(X/Y)$ by
+
+$$\sqrt( \frac{\sigma_X^2}{\mu_X^2} + \frac{\sigma_Y^2}{\mu_Y^2}).$$
+
+For each census tract, we calculate the above quantity, and remove any
+census tract for which the standard error of the above quantity was greater than
+five. After these two steps, we remained with 500 of the 783 original census tracts.
+With these variables, we then perform a [Deming regression](https://en.wikipedia.org/wiki/Deming_regression) of the two ratios against each other, which accounts for the variability
+in both of the observations. 
+
+```{r}
+df_rent_distribution_2010_tract <- map_dfr(
+    lst(2010),
+    ~ get_acs(
+        geography = "tract",
+        state = "GA",
+        variables = rent_var_list_2010,
+        year = .x,
+        county = arc_counties,
+        survey = "acs5",
+        geometry = FALSE
+    ),
+    .id = "year") %>% mutate(
+        tract = gsub("^(.*?),.*", "\\1", NAME),
+        county = gsub("^(.*?), (.*?),.*", "\\2", NAME)
+    ) %>% 
+    select(-NAME) %>%
+    relocate(tract, county, .after = GEOID) 
+
+df_rent_distribution_2019_tract <- map_dfr(
+    lst(2019),
+    ~ get_acs(
+        geography = "tract",
+        state = "GA",
+        variables = rent_var_list_2020,
+        year = .x,
+        county = arc_counties,
+        survey = "acs5",
+        geometry = FALSE
+    ),
+    .id = "year") %>% mutate(
+        tract = gsub("^(.*?),.*", "\\1", NAME),
+        county = gsub("^(.*?), (.*?),.*", "\\2", NAME)
+    ) %>% 
+    select(-NAME) %>%
+    relocate(tract, county, .after = GEOID) 
+
+df_rent_distribution_tract <- bind_rows(
+    df_rent_distribution_2010_tract, df_rent_distribution_2019_tract
+)
+
+df_rent_dist_summary_tract <- df_rent_distribution_tract %>% 
+    mutate(variable = fct_collapse(
+    variable,
+    "Less than $750" = c(
+        "Less than $100", "$100 to $149", "$150 to $199", "$200 to $249",
+        "$250 to $299", "$300 to $349", "$350 to $399",
+        "$400 to $449", "$450 to $499", "$500 to $549",
+        "$550 to $599", "$600 to $649", "$650 to $699",
+        "$700 to $749"
+    ),
+    "$750 to $999" = c(
+        "$750 to $799", "$800 to $899", "$900 to $999"
+    ),
+    "$1,000 to $1,249" = c(
+        "$1,000 to $1,249"
+    ),
+    "$1,250 to $1,499" = c(
+        "$1,250 to $1,499"
+    ),
+    "$1,500 to $1,999" = c(
+        "$1,500 to $1,999"
+    ),
+    "$2,000 or more" = c(
+        "$2,000 or more", "$2,000 to $2,499",
+        "$2,500 to $2,999", "$3,000 to $3,499",
+        "$3,500 or more"
+    )
+)) %>% group_by(year, variable, GEOID) %>%
+    summarize(
+        estimate = sum(estimate), moe = sqrt(sum(moe**2))
+    ) %>%
+    filter(variable %in% collapsed_factors) %>%
+    mutate(
+        variable = factor(variable, 
+            ordered = "true", levels = collapsed_factors)
+        )
+
+df_rent_change_dist_summary <- df_rent_dist_summary_tract %>%
+    filter(variable %in% c("Less than $750", "$750 to $999")) %>%
+    select(year, GEOID, variable, estimate, moe) %>%
+    group_by(year, GEOID) %>%
+    summarize(
+        estimate = sum(estimate),
+        moe = sqrt(sum(moe**2))
+    ) %>%
+    ungroup() %>%
+    pivot_wider(
+        names_from = year, values_from = c(estimate, moe),
+        names_prefix = "lt_750_"
+    ) %>%
+    mutate(
+        ratio = estimate_lt_750_2019 / estimate_lt_750_2010,
+        log_ratio_moe = sqrt((moe_lt_750_2019/estimate_lt_750_2019)**2 + (moe_lt_750_2010/estimate_lt_750_2010)**2)
+    ) %>% left_join(
+        df_rdincome_total_change_tracts %>% 
+            select(-geometry) %>%
+            filter(variable == 'Less than $50,000'), by = "GEOID"
+    )
+
+df_rent_change_dist_summary %>%
+    filter(ratio.x > 0, ratio.x < Inf) %>%
+    filter(log_ratio_moe.x < 5, log_ratio_moe.y < 5) %>%
+    ggplot(aes(x = ratio.x, y = ratio.y)) + geom_point() +
+    scale_x_log10() + scale_y_log10() + 
+    labs(
+        x = "Ratio of occupied rental units with gross rent less than $1,000 a month in rent from 2019 to 2010",
+        y = "Ratio of households earning less than $50,000 from 2019 to 2010"
+    )
+
+df_rent_cor_test <- df_rent_change_dist_summary %>%
+    filter(ratio.x > 0, ratio.x < Inf) %>%
+    filter(log_ratio_moe.x < 5, log_ratio_moe.y < 5) 
+
+# Not accounting for varition between multiple variables
+cor.test(
+    log(df_rent_cor_test$ratio.x), log(df_rent_cor_test$ratio.y),
+    use = "complete.obs"
+)
+
+require('deming')
+dr <- deming(
+    log(ratio.y) ~ log(ratio.x), data = df_rent_cor_test,
+    xstd = log_ratio_moe.x, ystd = log_ratio_moe.y
+)
+dr
+```
+
+# Incorporating land-use change data
+
+- Extract the land change data from the land use dataset for two of the
+years 
+
+- Compute correlation with land use + 
+    - gain in households with income in the high brackets 
+    - gain in households with income in the low brackets
+    - income change in general
 
 - From the satellite imagery, look at 
 areas of interest in 2010 as compared to as recently as possible,
 see what changes are there
-    - The place in Forsyth County ()
+    - The place in Forsyth County
     - The place "in the wedge"
     - The place at the intersection of DeKalb and Fulton
     - 11 o-clock in the perimeter
 
-- Extract the land change data from the land use dataset for
-each of the years 
 
-## Plans for the weekend:
 
-- Have both a line plot per year, and the bar plot showing
-    the change between 2009 and 2019
-
-- Plots for proportion of people moving: threshold the color
-changes between -0.15 and 0.15
-
-- Plots for total number of people moving: threshold the color
-changes between -500 and 500 households per tract
 
