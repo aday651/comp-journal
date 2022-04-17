@@ -122,6 +122,15 @@ arc_tracts_shp <- sf::st_read("../ga-tracts-2019/tl_2019_13_tract.shp") %>%
 
 highway_arc <- st_intersection(highways, arc_counties_shp)
 
+atlanta_msa_shp <- sf::st_read("../ga-counties/Counties_Georgia.shp") %>%
+    filter(NAME10 %in% atlanta_msa) %>%
+    select(NAME10, COUNTYFP10, geometry)
+
+sf_use_s2(FALSE)
+highway_arc_msa <- st_intersection(
+    highways, sf::st_buffer(atlanta_msa_shp, dist = 0)
+)
+
 ggplot() +
     geom_sf(data = arc_tracts_shp, colour = "grey", fill = NA) +
     geom_sf(data = arc_counties_shp, colour = "black", fill = NA) +
@@ -1103,58 +1112,6 @@ p2_total + coord_sf(xlim = c(-84.53, -84.2), ylim = c(33.6, 33.95), expand = FAL
 ggsave("img-files/income_changes_tract_income_net_change_highlow_itp.pdf")
 ```
 
-## Correlations between income changes in tracts
-
-```{r}
-df_rdincome_tc_corr <- df_income_tracts %>%
-    filter(variable != "Total") %>%
-    select(year, GEOID, variable, estimate) %>%
-    mutate(variable = fct_collapse(variable,
-        "band_1" = c(
-            "Less than $10,000", "$10,000 to $14,999", 
-            "$15,000 to $19,999", "$20,000 to $24,999",
-            "$25,000 to $29,999", "$30,000 to $34,999",
-            "$35,000 to $39,999", "$40,000 to $44,999",
-            "$45,000 to $49,999", "$50,000 to $59,999",
-            "$60,000 to $74,999"
-        ),
-        "band_2" = c("$75,000 to $99,999"),
-        "band_3" = c(
-            "$100,000 to $124,999", "$125,000 to $149,999"
-        ),
-        "band_4" = c("$150,000 to $199,999", "$200,000 or more")
-    )) %>%
-    mutate(
-        variable = factor(
-            variable, ordered = TRUE, 
-            levels = c(
-                "band_1", "band_2", "band_3", "band_4"
-            )
-        )
-    ) %>%
-    group_by(year, GEOID, variable) %>%
-    summarize(estimate = sum(estimate)) %>%
-    ungroup() %>%
-    pivot_wider(
-        names_from = "year",
-        names_prefix = "estimate_",
-        values_from = "estimate"
-    ) %>%
-    mutate(change = estimate_2019 - estimate_2010)
-
-dft <- df_rdincome_tc_corr %>%
-    select(GEOID, variable, change) %>%
-    pivot_wider(names_from = variable, values_from = change) %>%
-    left_join(
-        df_tracts %>% 
-            st_drop_geometry() %>%
-            select(GEOID, class)
-    )
-
-ggplot(dft, aes(x = band_1 + band_2, y = band_4)) +
-    geom_point()
-```
-
 # Migration patterns - income of people moving inside census tracts
 
 ```{r}
@@ -1289,11 +1246,22 @@ df_income_in_5yr %>%
 ## Are individuals being forced out?
 
 Before doing anything with the data, we note that there is nothing casual we
-can say here. However, we can describe associations between different income groups;
+can say here. However, we can describe associations between 
+different income groups;
 here, we investigate whether there is a general association between the change
-in those earning less than $75,000 a year, and those earning $200,000 or more in an area.
+in those earning less than $75,000 a year, and those earning $150,000 or more in an area.
+
+From the resulting analysis, we see that there is an association between
+the growth of those earning $150,000 or more a year in a census tract, 
+and the shrinking of those earning $75,000 a year or less. 
+
+(Below in the section about the relationship between the change in
+rent and the change in those in an income bracket is a description
+of the procedure we use to do this analysis.) 
 
 ```{r}
+library(deming)
+
 df_income_change_corr <- df_rdincome_total_change_tracts %>% 
     select(GEOID, variable, ratio, log_ratio_moe) %>%
     filter(variable %in% c("Less than $50,000", "$200,000 or more")) %>%
@@ -1320,6 +1288,72 @@ dr2 <- deming(
     ystd = log_ratio_moe_lt_50k, xstd = log_ratio_moe_gt_200k
 )
 dr2
+
+df_income_change_corr <- df_income_tracts %>%
+    filter(variable != "Total") %>%
+    select(year, GEOID, variable, estimate, moe) %>%
+    mutate(variable = fct_collapse(variable, 
+        "Less than $75,000" = c(
+            "Less than $10,000", "$10,000 to $14,999", 
+            "$15,000 to $19,999", "$20,000 to $24,999",
+            "$25,000 to $29,999", "$30,000 to $34,999",
+            "$35,000 to $39,999", "$40,000 to $44,999",
+            "$45,000 to $49,999", "$50,000 to $59,999", 
+            "$60,000 to $74,999"
+        ),
+        "$75,000 to $99,999" = c("$75,000 to $99,999"),
+        "$100,000 to $149,999" = c(
+            "$100,000 to $124,999", "$125,000 to $149,999"
+        ),
+        "$150,000 or more" = c(
+            "$150,000 to $199,999", "$200,000 or more"
+            )
+    )) %>%
+    mutate(
+        variable = factor(
+            variable, ordered = TRUE, 
+            levels = c(
+                "Less than $75,000", "$75,000 to $99,999",
+                "$100,000 to $149,999", "$150,000 or more"
+            )
+        )
+    ) %>%
+    group_by(year, GEOID, variable) %>%
+    summarize(
+        estimate = sum(estimate),
+        moe = sqrt(sum(moe**2))
+    ) %>%
+    ungroup() %>%
+    pivot_wider(
+        names_from = "year",
+        values_from = c("estimate", "moe")
+    ) %>%
+    mutate(
+        change = estimate_2019 - estimate_2010,
+        ratio = estimate_2019 / estimate_2010,
+        log_ratio_moe = sqrt((moe_2019/estimate_2019)**2 + (moe_2010/estimate_2010)**2)
+    ) %>%
+    left_join(df_tracts) %>% 
+    select(GEOID, variable, ratio, log_ratio_moe) %>%
+    filter(variable %in% c("Less than $75,000", "$150,000 or more")) %>%
+    mutate(variable = fct_recode(
+        variable, "lt_75k" = "Less than $75,000", "gt_150k" = "$150,000 or more"
+    )) %>%
+    pivot_wider(
+        names_from = variable,
+        values_from = c("ratio", "log_ratio_moe")
+    )
+
+require(deming)
+
+dr <- deming(
+    log(ratio_lt_75k) ~ log(ratio_gt_150k), 
+    data = df_income_change_corr %>% filter(
+        ratio_gt_150k < 20, ratio_gt_150k > 0.01
+    ),
+    ystd = log_ratio_moe_lt_75k, xstd = log_ratio_moe_gt_150k
+)
+dr
 ```
 
 ## Change in number of households earning less than $75,000 in Atlanta and the surrounding area 
@@ -1332,7 +1366,109 @@ the [current living wage](https://livingwage.mit.edu/metros/12060)) estimate for
 two adult household with two children and one adult working.
 
 ```{r}
+df_tracts_msa <- map_dfr(
+    lst(2010),
+    ~ get_acs(
+        geography = "tract",
+        state = "GA",
+        variables = "B19001_001",
+        year = .x,
+        county = atlanta_msa,
+        survey = "acs5",
+        geometry = TRUE
+    ),
+    .id = "year") %>% 
+    select(GEOID, geometry) %>%
+    mutate(
+        tp = st_intersects(
+            st_transform(st_boundary(itp), crs = 4269),
+            geometry, sparse = FALSE
+        )[1, ],
+        itp = st_within(
+            geometry,
+            st_transform(itp, crs = 4269), sparse = FALSE
+        )[, 1],
+        itp = tp | itp,
+        otp = !itp
+    ) %>% select(-tp) %>%
+    pivot_longer(
+        cols = c(itp, otp),
+        names_to = "class",
+        values_to = "in_class"
+    ) %>%
+    filter(in_class == TRUE) %>%
+    select(-in_class)
 
+df_income_tracts_msa <- map_dfr(
+    lst(2010, 2019),
+    ~ get_acs(
+        geography = "tract",
+        state = "GA",
+        variables = income_var_list,
+        year = .x,
+        county = atlanta_msa,
+        survey = "acs5",
+        geometry = FALSE
+    ),
+    .id = "year") %>%
+    mutate(
+        tract = gsub("^(.*?),.*", "\\1", NAME),
+        county = gsub("^(.*?), (.*?),.*", "\\2", NAME)
+    ) %>% 
+    select(-NAME) %>%
+    relocate(tract, county, .after = GEOID) %>%
+    filter(variable != "Total") %>%
+    select(year, GEOID, variable, estimate) %>%
+    mutate(variable = fct_collapse(variable, 
+        "Less than $50,000" = c(
+            "Less than $10,000", "$10,000 to $14,999", 
+            "$15,000 to $19,999", "$20,000 to $24,999",
+            "$25,000 to $29,999", "$30,000 to $34,999",
+            "$35,000 to $39,999", "$40,000 to $44,999",
+            "$45,000 to $49,999"
+        ),
+        "$50,000 to $74,999" = c("$50,000 to $59,999", "$60,000 to $74,999"),
+        "$75,000 to $99,999" = c("$75,000 to $99,999"),
+        "$100,000 to $149,999" = c(
+            "$100,000 to $124,999", "$125,000 to $149,999"
+        ),
+        "$150,000 to $199,999" = c("$150,000 to $199,999"),
+        "$200,000 or more" = c("$200,000 or more")
+    )) %>%
+    mutate(
+        variable = factor(variable, ordered = TRUE, levels = income_var_labels)
+    ) %>%
+    group_by(year, GEOID, variable) %>%
+    summarize(estimate = sum(estimate)) %>%
+    pivot_wider(
+        names_from = "year",
+        names_prefix = "estimate_",
+        values_from = "estimate"
+    ) %>%
+    mutate(change = estimate_2019 - estimate_2010) %>%
+    left_join(df_tracts_msa)
+
+p_wider <- ggplot() +
+    geom_sf(
+        data = df_income_tracts_msa %>%
+        filter(variable == "Less than $50,000") %>%
+        mutate(change = pminmax(change, -500, 500)),
+        aes(geometry = geometry, fill = change),
+        colour = "grey", lwd = 0.25
+    ) + scale_fill_viridis(
+        option = "turbo",
+        labels = c("<= -500", -250, 0, 250, "500 <=")
+    ) + geom_sf(data = atlanta_msa_shp, colour = "black", fill = NA) +
+    geom_sf(data = highway_arc_msa, colour = "black", lty = 3, fill = NA) +
+    theme(legend.position = "bottom") +
+    labs(
+        fill = "Change in number of households earning less than $50,000",
+        title = "Change in number of households in income band by tract",
+        subtitle = "(Data using 5-year estimates from the 2006-2010 ACS and 2015-2019 ACS)"
+    ) +
+    theme(legend.key.width = unit(2, 'cm'))
+
+p_wider
 ```
 
 
@@ -1567,9 +1703,10 @@ df_rent_upper_quartile
 
 ## Correlation with change in number of households in income brackets
 
-Hmm, suprisingly there doesn't appear to be any correlation between the change 
-in the number of households in the lower income bracket as compared to the change
-in rent in a particular census tract. To be honest, I find this pretty surprising...
+We see that there is a weak (but statistically significant)
+negative correlation between the change in number of households earning
+less than $50,000, and the rate at which rent has increased (after
+adjusting for inflation).
 
 ```{r}
 df_rent_lower_quartile_tracts <- map_dfr(
@@ -1590,50 +1727,60 @@ df_rent_lower_quartile_tracts <- map_dfr(
     select(-NAME) %>%
     relocate(tract, county, .after = GEOID) %>%
     filter(tract != "Census Tract 9800") %>%
-    select(GEOID, year, estimate) %>%
+    select(GEOID, year, estimate, moe) %>%
     pivot_wider(
-        names_from = year, values_from = estimate,
+        names_from = year, 
+        values_from = c(estimate, moe),
         names_prefix = "rent_"
     ) %>%
     mutate(
-        rent_2010_in_2019_dollars = rent_2010 * 1.175,
-        ratio_adjusting_for_inflation = rent_2019 / (rent_2010 * 1.175)
+        estimate_rent_2010_in_2019_dollars = estimate_rent_2010 * 1.175,
+        ratio_adjusting_for_inflation = estimate_rent_2019 / (estimate_rent_2010 * 1.175),
+        rent_log_ratio_moe = sqrt( (moe_rent_2019 / estimate_rent_2019)**2 + (moe_rent_2010 / estimate_rent_2010)**2 )
     )
 
 df_ratio_change_tracts <- df_rdincome_total_change_tracts %>%
     select(-geometry) %>%
     filter(variable %in% c("Less than $50,000")) %>%
-    select(GEOID, variable, estimate_2010, estimate_2019, class) %>%
-    group_by(GEOID) %>%
-    mutate(
-        estimate_2010 = sum(estimate_2010),
-        estimate_2019 = sum(estimate_2019)
-    ) %>% ungroup() %>% unique() %>%
-    mutate(
-        pop_ratio = estimate_2019 / estimate_2010
-    )
+    select(GEOID, ratio, log_ratio_moe)
 
 df_tract_changes <- left_join(
-    df_rent_upper_quartile_tracts, df_ratio_change_tracts
+    df_rent_lower_quartile_tracts, df_ratio_change_tracts
 )
 
 df_tract_changes %>% 
-    ggplot(aes(x = ratio_adjusting_for_inflation, y = pop_ratio, col = class)) +
+    ggplot(aes(
+        x = ratio_adjusting_for_inflation, y = ratio)
+    ) +
     scale_x_log10() + scale_y_log10() +
     geom_point()
 
-cor.test(
-    df_tract_changes$ratio_adjusting_for_inflation,
-    df_tract_changes$pop_ratio,
+ct <- cor.test(
+    log(df_tract_changes$ratio_adjusting_for_inflation),
+    log(df_tract_changes$ratio),
     use = "complete.obs"
 )
+
+ct
+
+dr <- deming(
+    log(ratio_adjusting_for_inflation) ~ log(ratio), data = df_tract_changes,
+    xstd = log_ratio_moe, ystd = rent_log_ratio_moe
+)
+dr
+
+dr2 <- deming(
+    log(ratio) ~ log(ratio_adjusting_for_inflation), data = df_tract_changes,
+    ystd = log_ratio_moe, xstd = rent_log_ratio_moe
+)
+dr2
 ```
 
-However, if we look at
+Moreover, if we look at
 - the ratio of households earning less than $50,000 a year between 2019 and 2010, and
 - the number of renters paying less than $1,000 a month in rent between 2019 and 2010
-across the tracts, we see that there is a statistically significant relationship
-between the two ratios.
+across the tracts, we also see that there is a statistically 
+significant relationship between the two ratios.
 
 In performing this calculation, we removed census tracts for which the
 estimated number of households paying less than $1,000 in rent was zero in
@@ -1774,11 +1921,18 @@ cor.test(
 )
 
 require('deming')
+
 dr <- deming(
     log(ratio.y) ~ log(ratio.x), data = df_rent_cor_test,
     xstd = log_ratio_moe.x, ystd = log_ratio_moe.y
 )
 dr
+
+dr2 <- deming(
+    log(ratio.x) ~ log(ratio.y), data = df_rent_cor_test,
+    ystd = log_ratio_moe.x, xstd = log_ratio_moe.y
+)
+dr2
 ```
 
 # Incorporating land-use change data
