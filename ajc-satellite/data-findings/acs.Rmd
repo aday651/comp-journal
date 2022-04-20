@@ -30,6 +30,11 @@ library(lubridate)
 library(zoo)
 library(sf)
 library(viridis)
+library(deming)
+
+pminmax <- function(x, min_val, max_val) {
+    return(pmin(pmax(x, min_val), max_val))
+}
 ```
 
 # Geographic units and time period(s) considered
@@ -840,10 +845,6 @@ df_rdincome_change_tracts %>%
         title = "Change in number of households in different income bands across census tracts", 
         subtitle = "(Data from the 5-year ACS 2006-2010 and 2015-2019)"
     )
-
-pminmax <- function(x, min_val, max_val) {
-    return(pmin(pmax(x, min_val), max_val))
-}
 ```
 
 ```{r}
@@ -1255,10 +1256,6 @@ From the resulting analysis, we see that there is an association between
 the growth of those earning $150,000 or more a year in a census tract, 
 and the shrinking of those earning $75,000 a year or less. 
 
-(Below in the section about the relationship between the change in
-rent and the change in those in an income bracket is a description
-of the procedure we use to do this analysis.) 
-
 ```{r}
 library(deming)
 
@@ -1484,9 +1481,6 @@ than what they were ten years ago, even when adjusting for inflation.
 The same occurs in most of the counties for the upper quartile of
 monthly rent.
 
-(Note: the income adjustment factor between 2010 and 2020 is 1.19
-according to the [Consumer Price Index](https://www.bls.gov/cpi/research-series/r-cpi-u-rs-home.htm))
-
 ```{r}
 v20 <- load_variables(2020, "acs5", cache = TRUE)
 
@@ -1687,7 +1681,9 @@ df_rent_upper_quartile <- map_dfr(
     .id = "year") %>%
     mutate(
         county = gsub("^(.*?),.*", "\\1", NAME)
-    ) %>% select(-NAME) %>% relocate(county, .after = GEOID) %>%
+    ) %>% 
+    select(-NAME) %>% 
+    relocate(county, .after = GEOID) %>%
     select(county, year, estimate) %>%
     pivot_wider(
         names_from = year, values_from = estimate,
@@ -1701,20 +1697,21 @@ df_rent_upper_quartile <- map_dfr(
 df_rent_upper_quartile
 ```
 
-## Correlation with change in number of households in income brackets
-
-We see that there is a weak (but statistically significant)
-negative correlation between the change in number of households earning
-less than $50,000, and the rate at which rent has increased (after
-adjusting for inflation).
+## Examining quintiles of earnings
 
 ```{r}
-df_rent_lower_quartile_tracts <- map_dfr(
+df_income_quintiles <- map_dfr(
     lst(2010, 2019),
     ~ get_acs(
         geography = "tract",
         state = "GA",
-        variables = "B25057_001",
+        variables = c(
+            first_qui = "B19080_001",
+            second_qui = "B19080_002",
+            third_qui = "B19080_003",
+            fourth_qui = "B19080_004",
+            top_5per = "B19080_005"
+        ),
         year = .x,
         county = arc_counties,
         survey = "acs5",
@@ -1726,87 +1723,56 @@ df_rent_lower_quartile_tracts <- map_dfr(
     ) %>% 
     select(-NAME) %>%
     relocate(tract, county, .after = GEOID) %>%
-    filter(tract != "Census Tract 9800") %>%
-    select(GEOID, year, estimate, moe) %>%
+    select(year, GEOID, variable, estimate, moe) %>%
+    mutate(
+        inflation_factor = ifelse(year == "2019", 1, 1.175),
+        estimate = estimate * inflation_factor,
+        moe = moe * inflation_factor
+    ) %>% 
+    select(-inflation_factor)
+
+df_income_quintiles_change <- df_income_quintiles %>%
+    filter(variable %in% c("first_qui", "top_5per")) %>%
     pivot_wider(
-        names_from = year, 
-        values_from = c(estimate, moe),
-        names_prefix = "rent_"
+        names_from = year,
+        values_from = c(estimate, moe)
     ) %>%
     mutate(
-        estimate_rent_2010_in_2019_dollars = estimate_rent_2010 * 1.175,
-        ratio_adjusting_for_inflation = estimate_rent_2019 / (estimate_rent_2010 * 1.175),
-        rent_log_ratio_moe = sqrt( (moe_rent_2019 / estimate_rent_2019)**2 + (moe_rent_2010 / estimate_rent_2010)**2 )
+        estimate_diff = estimate_2019 - estimate_2010,
+        moe_diff = sqrt(moe_2019**2 + moe_2010**2)
+    ) %>% 
+    select(GEOID, variable, estimate_diff, moe_diff) %>%
+    pivot_wider(
+        names_from = variable,
+        values_from = c(estimate_diff, moe_diff)
     )
 
-df_ratio_change_tracts <- df_rdincome_total_change_tracts %>%
-    select(-geometry) %>%
-    filter(variable %in% c("Less than $50,000")) %>%
-    select(GEOID, ratio, log_ratio_moe)
-
-df_tract_changes <- left_join(
-    df_rent_lower_quartile_tracts, df_ratio_change_tracts
-)
-
-df_tract_changes %>% 
-    ggplot(aes(
-        x = ratio_adjusting_for_inflation, y = ratio)
-    ) +
-    scale_x_log10() + scale_y_log10() +
-    geom_point()
-
-ct <- cor.test(
-    log(df_tract_changes$ratio_adjusting_for_inflation),
-    log(df_tract_changes$ratio),
-    use = "complete.obs"
-)
-
-ct
-
-dr <- deming(
-    log(ratio_adjusting_for_inflation) ~ log(ratio), data = df_tract_changes,
-    xstd = log_ratio_moe, ystd = rent_log_ratio_moe
-)
-dr
-
-dr2 <- deming(
-    log(ratio) ~ log(ratio_adjusting_for_inflation), data = df_tract_changes,
-    ystd = log_ratio_moe, xstd = rent_log_ratio_moe
-)
-dr2
+df_income_quintiles_change %>%
+    ggplot(aes(x = estimate_diff_top_5per)) +
+    geom_histogram() + 
+    labs(
+        x = "Adjusted difference in 95% percentile of income between 2010 and 2019",
+        subtitle = "Spike occurs due to max income being capped at a particular level"
+    )
 ```
 
-Moreover, if we look at
-- the ratio of households earning less than $50,000 a year between 2019 and 2010, and
-- the number of renters paying less than $1,000 a month in rent between 2019 and 2010
-across the tracts, we also see that there is a statistically 
-significant relationship between the two ratios.
+## Examining measures of income inequality
 
-In performing this calculation, we removed census tracts for which the
-estimated number of households paying less than $1,000 in rent was zero in
-either of the time periods. We also removed ratios whose standard errors were too
-high. To do so, we note that it is usually assumed that, across different periods
-of time, variables are independent, and are approximately Normally distributed
-with mean given by the estimate, and standard error given by the [margin of error
-divided by 1.645](https://www.census.gov/programs-surveys/acs/guidance/training-presentations/acs-moe.html). In general, if $X \sim N(\mu_X, \sigma_X^2)$
-and $Y \sim N(\mu_Y, \sigma_Y^2)$ are independent, then we can approximate
-the standard error of $\log(X/Y)$ by
-
-$$\sqrt( \frac{\sigma_X^2}{\mu_X^2} + \frac{\sigma_Y^2}{\mu_Y^2}).$$
-
-For each census tract, we calculate the above quantity, and remove any
-census tract for which the standard error of the above quantity was greater than
-five. After these two steps, we remained with 500 of the 783 original census tracts.
-With these variables, we then perform a [Deming regression](https://en.wikipedia.org/wiki/Deming_regression) of the two ratios against each other, which accounts for the variability
-in both of the observations. 
+The [Gini coefficient](https://en.wikipedia.org/wiki/Gini_coefficient) is a measure of income inequality frequently used. We examine the change in the
+estimate Gini coefficient in each census tract, comparing the periods
+between 2006-2010 and 2015-2019, and when doing so, we find that
+there is a statistically significant increase in the Gini coefficient
+generally across tracts when doing so. 
 
 ```{r}
-df_rent_distribution_2010_tract <- map_dfr(
-    lst(2010),
+df_gini <- map_dfr(
+    lst(2010, 2019),
     ~ get_acs(
         geography = "tract",
         state = "GA",
-        variables = rent_var_list_2010,
+        variables = c(
+            gini = "B19083_001"
+        ),
         year = .x,
         county = arc_counties,
         survey = "acs5",
@@ -1817,142 +1783,315 @@ df_rent_distribution_2010_tract <- map_dfr(
         county = gsub("^(.*?), (.*?),.*", "\\2", NAME)
     ) %>% 
     select(-NAME) %>%
-    relocate(tract, county, .after = GEOID) 
+    relocate(tract, county, .after = GEOID) %>%
+    select(year, GEOID, estimate, moe)
 
-df_rent_distribution_2019_tract <- map_dfr(
-    lst(2019),
-    ~ get_acs(
-        geography = "tract",
-        state = "GA",
-        variables = rent_var_list_2020,
-        year = .x,
-        county = arc_counties,
-        survey = "acs5",
-        geometry = FALSE
-    ),
-    .id = "year") %>% mutate(
-        tract = gsub("^(.*?),.*", "\\1", NAME),
-        county = gsub("^(.*?), (.*?),.*", "\\2", NAME)
-    ) %>% 
-    select(-NAME) %>%
-    relocate(tract, county, .after = GEOID) 
-
-df_rent_distribution_tract <- bind_rows(
-    df_rent_distribution_2010_tract, df_rent_distribution_2019_tract
-)
-
-df_rent_dist_summary_tract <- df_rent_distribution_tract %>% 
-    mutate(variable = fct_collapse(
-    variable,
-    "Less than $750" = c(
-        "Less than $100", "$100 to $149", "$150 to $199", "$200 to $249",
-        "$250 to $299", "$300 to $349", "$350 to $399",
-        "$400 to $449", "$450 to $499", "$500 to $549",
-        "$550 to $599", "$600 to $649", "$650 to $699",
-        "$700 to $749"
-    ),
-    "$750 to $999" = c(
-        "$750 to $799", "$800 to $899", "$900 to $999"
-    ),
-    "$1,000 to $1,249" = c(
-        "$1,000 to $1,249"
-    ),
-    "$1,250 to $1,499" = c(
-        "$1,250 to $1,499"
-    ),
-    "$1,500 to $1,999" = c(
-        "$1,500 to $1,999"
-    ),
-    "$2,000 or more" = c(
-        "$2,000 or more", "$2,000 to $2,499",
-        "$2,500 to $2,999", "$3,000 to $3,499",
-        "$3,500 or more"
-    )
-)) %>% group_by(year, variable, GEOID) %>%
-    summarize(
-        estimate = sum(estimate), moe = sqrt(sum(moe**2))
-    ) %>%
-    filter(variable %in% collapsed_factors) %>%
-    mutate(
-        variable = factor(variable, 
-            ordered = "true", levels = collapsed_factors)
-        )
-
-df_rent_change_dist_summary <- df_rent_dist_summary_tract %>%
-    filter(variable %in% c("Less than $750", "$750 to $999")) %>%
-    select(year, GEOID, variable, estimate, moe) %>%
-    group_by(year, GEOID) %>%
-    summarize(
-        estimate = sum(estimate),
-        moe = sqrt(sum(moe**2))
-    ) %>%
-    ungroup() %>%
+df_gini_wide <- df_gini %>%
     pivot_wider(
-        names_from = year, values_from = c(estimate, moe),
-        names_prefix = "lt_750_"
+        values_from = c(estimate, moe),
+        names_from = year,
+        names_prefix = "gini_",
+        names_sep = "_"
     ) %>%
     mutate(
-        ratio = estimate_lt_750_2019 / estimate_lt_750_2010,
-        log_ratio_moe = sqrt((moe_lt_750_2019/estimate_lt_750_2019)**2 + (moe_lt_750_2010/estimate_lt_750_2010)**2)
-    ) %>% left_join(
-        df_rdincome_total_change_tracts %>% 
-            select(-geometry) %>%
-            filter(variable == 'Less than $50,000'), by = "GEOID"
+        diff = estimate_gini_2019 - estimate_gini_2010,
+        diff_moe = sqrt(moe_gini_2019**2 + moe_gini_2010**2),
+        diff_sd = diff_moe / 1.645,
+        ratio = estimate_gini_2019 / estimate_gini_2010,
+        log_ratio_moe = sqrt( (moe_gini_2010 / estimate_gini_2010)**2 + (moe_gini_2019 / estimate_gini_2019)**2  ),
+        log_ratio_sd = log_ratio_moe / 1.645
     )
 
-df_rent_change_dist_summary %>%
-    filter(ratio.x > 0, ratio.x < Inf) %>%
-    filter(log_ratio_moe.x < 5, log_ratio_moe.y < 5) %>%
-    ggplot(aes(x = ratio.x, y = ratio.y)) + geom_point() +
-    scale_x_log10() + scale_y_log10() + 
-    labs(
-        x = "Ratio of occupied rental units with gross rent less than $1,000 a month in rent from 2019 to 2010",
-        y = "Ratio of households earning less than $50,000 from 2019 to 2010"
-    )
+mean_est <- mean(df_gini_wide$diff, na.rm = TRUE)
+sd1 <- sd(df_gini_wide$diff, na.rm = TRUE)
+sd2 <- sqrt(mean(df_gini_wide$diff_sd**2, na.rm = TRUE))
+samp_n <- sum(!is.na(df_gini_wide$diff))
 
-df_rent_cor_test <- df_rent_change_dist_summary %>%
-    filter(ratio.x > 0, ratio.x < Inf) %>%
-    filter(log_ratio_moe.x < 5, log_ratio_moe.y < 5) 
-
-# Not accounting for varition between multiple variables
-cor.test(
-    log(df_rent_cor_test$ratio.x), log(df_rent_cor_test$ratio.y),
-    use = "complete.obs"
-)
-
-require('deming')
-
-dr <- deming(
-    log(ratio.y) ~ log(ratio.x), data = df_rent_cor_test,
-    xstd = log_ratio_moe.x, ystd = log_ratio_moe.y
-)
-dr
-
-dr2 <- deming(
-    log(ratio.x) ~ log(ratio.y), data = df_rent_cor_test,
-    ystd = log_ratio_moe.x, xstd = log_ratio_moe.y
-)
-dr2
+t_stat <- sqrt(samp_n)*mean_est/sqrt(sd1**2 + sd2**2)
+p_val <- pt(t_stat, df = samp_n, lower.tail = FALSE)
+print(paste("p-value of hypothesis test:", p_val))
 ```
 
 # Incorporating land-use change data
 
-- Extract the land change data from the land use dataset for two of the
-years 
+```{r}
+land_use_labels <- read_csv("data-files/ncld_class_labels.csv") %>%
+    select(layer_vals, labels) %>%
+    add_row(layer_vals = 0, labels = "Roads")
 
-- Compute correlation with land use + 
-    - gain in households with income in the high brackets 
-    - gain in households with income in the low brackets
-    - income change in general
+land_use_labels %>% print(n = Inf)
 
-- From the satellite imagery, look at 
-areas of interest in 2010 as compared to as recently as possible,
-see what changes are there
-    - The place in Forsyth County
-    - The place "in the wedge"
-    - The place at the intersection of DeKalb and Fulton
-    - 11 o-clock in the perimeter
+land_use_df <- read_csv("data-files/ncld_histogram_data.csv")
+
+land_use_df <- land_use_df %>% 
+    complete(GEOID, year, class) %>%
+    mutate(value = replace_na(value, 0))
+
+land_use_change <- land_use_df %>% 
+    filter(year %in% c(2008, 2019)) %>%
+    group_by(GEOID, year) %>%
+    mutate(value = value / sum(value)) %>%
+    ungroup() %>%
+    pivot_wider(
+        names_from = year,
+        values_from = value,
+        names_prefix = "value_"
+    ) %>%
+    mutate(abs_diff = abs(value_2019 - value_2008)) %>%
+    group_by(GEOID) %>%
+    summarize(tv_dist = 0.5*sum(abs_diff))
+
+land_use_change %>%
+    ggplot(aes(x = tv_dist)) + geom_histogram() +
+    labs(
+        x = "Total variation change in land use proportions of tract",
+        y = "Number of census tracts"
+    )
+
+land_use_change_shp <- land_use_change %>%
+    mutate(GEOID = as.character(GEOID)) %>%
+    left_join(df_tracts)
+
+land_use_plot <- ggplot() +
+    geom_sf(
+        data = land_use_change_shp %>%
+        mutate(tv_dist = pminmax(tv_dist, 0, 0.05)),
+        aes(geometry = geometry, fill = tv_dist),
+        colour = "grey", lwd = 0.25
+    ) + scale_fill_viridis(
+        option = "viridis",
+        labels = c("0", "0.01", "0.02", "0.03", "0.04", "0.05+")
+    ) + 
+    geom_sf(data = arc_counties_shp, colour = "black", fill = NA) +
+    geom_sf(data = highway_arc, colour = "black", lty = 3, fill = NA) +
+    theme(legend.position = "bottom") +
+    labs(
+        fill = "Overall change in land type",
+        title = "Total variation between type of land use between 2008 and 2019",
+        subtitle = "(Data using NCLD National Land Cover Database)"
+    ) +
+    theme(legend.key.width = unit(2, 'cm'))
+
+land_use_plot
+ggsave("img-files/land_use_change.pdf")
+
+land_use_plot_outliers <- ggplot() +
+    geom_sf(
+        data = land_use_change_shp,
+        aes(geometry = geometry, fill = tv_dist),
+        colour = "grey", lwd = 0.25
+    ) + scale_fill_viridis(
+        option = "viridis"
+    ) + 
+    geom_sf(data = arc_counties_shp, colour = "black", fill = NA) +
+    geom_sf(data = highway_arc, colour = "black", lty = 3, fill = NA) +
+    theme(legend.position = "bottom") +
+    labs(
+        fill = "Overall change in land type\n(Not truncated)",
+        title = "Total variation between type of land use between 2008 and 2019",
+        subtitle = "(Data using NCLD National Land Cover Database)"
+    ) +
+    theme(legend.key.width = unit(2, 'cm'))
+
+land_use_plot_outliers
+
+land_use_plot + 
+    coord_sf(xlim = c(-84.53, -84.2), ylim = c(33.6, 33.95), expand = FALSE)
+
+ggsave("img-files/land_use_change_itp.pdf")
+```
+
+## Looking at reduced classes (merging together the non-developed types into one category)
+
+As we can see, looking at the most frequent "class" (i.e, the way in
+which the land has been used the most) tends to not change much across
+the two time periods, although there has been a growth in the more developed
+areas.
+
+```{r}
+land_use_df_summary <- land_use_df %>%
+    mutate(class = fct_collapse(
+        factor(class), "Roads" = "0",
+        "Developed, open space" = "21",
+        "Developed, low intensity" = "22",
+        "Developed, medium intensity" = "23",
+        "Developed, high intensity" = "24",
+        "Undeveloped / greenland" = c(
+            "11", "12", "31", "41", "42", 
+            "43", "51", "52", "71", "72", "73", "74",
+            "81", "82", "90", "95"
+        )
+    )) %>%
+    group_by(GEOID, year, class) %>%
+    summarize(value = sum(value)) %>%
+    filter(year %in% c(2008, 2019)) %>%
+    group_by(GEOID, year) %>%
+    mutate(value = value / sum(value))
+
+land_use_df_summary %>%
+    pivot_wider(
+        names_from = year,
+        values_from = value,
+        names_prefix = "value_"
+    ) %>%
+    mutate(value_diff = value_2019 - value_2008) %>%
+    group_by(GEOID) %>%
+    summarize(tv_diff = 0.5*sum(abs(value_diff))) %>%
+    ggplot(aes(x = tv_diff)) + geom_histogram() +
+    labs(
+        x = "Total variation difference between proportion of land use by tract from 2008 to 2019",
+        title = "Change in land-use (using reduced classes)"
+    )
+
+land_use_df_summary %>%
+    group_by(GEOID, year) %>%
+    mutate(max_value = max(value)) %>%
+    ungroup() %>%
+    filter(value == max_value) %>%
+    select(year, class) %>%
+    group_by(year, class) %>%
+    summarize(count = n()) %>%
+    pivot_wider(
+        values_from = count,
+        names_from = year
+    )
+```
+
+We can also see that both inside and outside of the perimeter,
+there is generally a trend towards more developed areas. 
+
+```{r}
+land_use_df %>%
+    mutate(class = fct_collapse(
+        factor(class), "Roads" = "0",
+        "Developed, open space" = "21",
+        "Developed, low intensity" = "22",
+        "Developed, medium intensity" = "23",
+        "Developed, high intensity" = "24",
+        "Undeveloped / greenland" = c(
+            "11", "12", "31", "41", "42", 
+            "43", "51", "52", "71", "72", "73", "74",
+            "81", "82", "90", "95"
+        )
+    )) %>% 
+    mutate(GEOID = as.character(GEOID)) %>%
+    left_join(
+        df_tracts %>% 
+        select(GEOID, class) %>%
+        rename(peri_class = class) %>%
+        st_drop_geometry()
+    ) %>%
+    group_by(year, class, peri_class) %>%
+    summarize(value = sum(value)) %>%
+    ungroup() %>%
+    pivot_wider(
+        values_from = value,
+        names_from = peri_class
+    ) %>%
+    group_by(year) %>%
+    mutate(itp = itp / sum(itp), otp = otp / sum(otp)) %>%
+    filter(year %in% c(2008, 2019)) %>%
+    pivot_wider(
+        names_from = year,
+        values_from = c(itp, otp)
+    ) %>% filter(class != "Roads")
+```
+
+## Clustering similar types of land together, examining changes
+
+```{r}
+land_use_cluster <- land_use_df %>% 
+    filter(year %in% c(2008, 2019)) %>%
+    group_by(GEOID, year) %>%
+    mutate(value = value / sum(value)) %>%
+    ungroup() %>%
+    pivot_wider(
+        names_from = class,
+        values_from = value,
+        names_prefix = "class_"
+    ) %>%
+    select(-class_0)
+
+library(cluster)
+
+clara(
+    land_use_cluster[, 3:17], 5, metric = "manhattan",
+    samples = 100
+)
+```
 
 
+# Appendix
 
+## Data sources
 
+- [The American Communities Survey](https://www.census.gov/programs-surveys/acs)
+    - We highlight that the ACS only provides one-year estimates for
+    geographical units with more than 70,000 residents, which means
+    it is suitable for looking at counties, but not census tracts. As
+    a result, we look at ACS 5-year estimates from non-overlapping
+    time periods when looking at census tracts. Moreover, due to
+    changes in the number and shapes of census tracts after
+    different decennial census periods, we restrict our analysis
+    to end points between 2010 and 2019 when examining census tracts.
+    We also highlight that 1-year estimates for the year 2020 [do not
+    exist](https://www.census.gov/newsroom/press-releases/2021/changes-2020-acs-1-year.html), as a result of the coronavirus pandemic.
+    - The ACS typically reports margin of errors, which correspond to
+    1.645 times the standard error; when performing hypotheis testing
+    we will make this adjustment from the margin of error values.
+    - Adjustments between dollar values are done according to the [Consumer Price Index](https://www.bls.gov/cpi/research-series/r-cpi-u-rs-home.htm);
+    for example, the income adjustment factor between 2010 and 2020 is 1.19,
+    and 1.175 for 2010 and 2019.
+- [National Land Cover Database](https://www.mrlc.gov/)
+- [Landsat satellite imagery](https://landsat.visibleearth.nasa.gov/)
+
+## Testing for correlations of noisy observations
+
+Suppose we make noisy observations $((X_i, Y_i))_{i =1, \ldots, N}$
+of some underlying quantities $( (\mu_{X, i}, \mu_{Y, i}) )_{i = 1, \ldots, N}$
+with known measurement standard errors $\sigma_{X, i}$ and $\sigma_{Y, i}$ respectively, and that the observations are made independently of each other.
+This is an assumption which is usually satisified by ACS data, where we make observations of multiple variables
+across different census tracts, with the noise arising from sampling uncertainity in not being able to survey all households. Here, $i$ acts as the index for census tracts,
+and $\mu_{X, i}$ and $\mu_{Y, i}$ represent some underlying variables (e.g
+median income and the Gini index in a census tract) which we are interested
+in).
+
+In such a scenario, it is typical to assume that conditional on the $\mu_{X, i}$ and $\mu_{Y, i}$ we have that 
+$$ \begin{pmatrix} X_i \\ Y_i \end{pmatrix} \sim N\Big( \begin{pmatrix} 
+\mu_{X, i} \\ \mu_{Y, i} \end{pmatrix}, \begin{pmatrix} \sigma_{X, i}^2 & 0 
+\\ 0 & \sigma_{Y, i}^2 \end{pmatrix} \Big). $$
+Making the additional assumption that 
+$$ \begin{pmatrix} \mu_{X, i} \\ \mu_{Y, i} \end{pmatrix} \sim 
+N\Big( \begin{pmatrix} \mu_{X} \\ \mu_{Y} \end{pmatrix}, \begin{pmatrix} \tau_X^2 & \rho \tau_X \tau_Y \\ \rho \tau_X \tau_Y & \tau_Y^2 \end{pmatrix} \Big)
+$$
+independently across the units $i$, then we are interested in making
+inference about $\rho$. To do so, we make use of the fact that under
+the above assumptions, the marginal distribution of the $(X_i, Y_i)$ is
+$$ \begin{pmatrix} X_i \\ Y_i \end{pmatrix} \sim 
+N\Big( \begin{pmatrix} \mu_{X} \\ \mu_{Y} \end{pmatrix}, \begin{pmatrix}
+\sigma_{X, i}^2 + \tau_X^2 & \rho \tau_X \tau_Y \\ \rho \tau_X \tau_Y & \sigma_{Y, i}^2 + \tau_Y^2 
+\end{pmatrix} \Big).
+$$
+As a result, under the assumption that $N^{-2} \sum_{i=1}^N (\sigma_{X, i}^4 + \sigma_{Y, i}^4) \to 0$ as $N \to \infty$, a consistent estimator for $\rho$ is
+given by 
+$$\frac{ N^{-1} \sum_{i=1}^N (X_i - \bar{X})(Y_i - \bar{Y}) }{ \big( N^{-1} \sum_{i=1}^N [ (X_i - \bar{X})^2 - \sigma_{X, i}^2 ] \big)^{1/2} \big( N^{-1} \sum_{i=1}^N [ (Y_i - \bar{Y})^2 - \sigma_{Y, i}^2 ] \big)^{1/2}        }$$
+where we write $\bar{X} = N^{-1} \sum_{i=1}^N X_i$ and $\bar{Y} = N^{-1} \sum_{i=1}^N Y_i$. In order to perform hypothesis testing, a [bootstrap](https://en.wikipedia.org/wiki/Bootstrapping_(statistics)) of the observed data
+$(X_i, Y_i, \sigma_{X, i}, \sigma_{Y, i})$ is used to approximate the
+sampling distribution of $\rho$. We note that in finite samples, one of the
+square root terms may be negative; in such a scenario, we return the value of
+$\rho$ as a `NA`; if this occurs frequently enough, then we will just consider
+the data too noisy to make reasonable inference for the presence of
+a correlation.
+
+## Standard errors of log ratios of quantities
+
+Suppose we have observations $X$ and $Y$ whose expected values are $\mu_X$
+and $\mu_Y$, and whose standard errors are $\sigma_X$ and $\sigma_Y$ respectively, and moreover suppose that $X$ and $Y$ are independent.
+In such a scenario, the estimate of $\log(X/Y)$ is approximated by
+$\log( \mu_X / \mu_Y )$ and the standard error is approximated by
+$$ \Big(   \frac{ \sigma_X^2}{ \mu_X^2} + \frac{ \sigma_Y^2}{\mu_Y^2} \Big)^{1/2}.$$ Looking at the ratio of quantities is suitable when we
+are interesting in looking at quantities which may be on different scales
+naturally, such as e.g the number of households in an census tract in
+different income bands, where census tracts may vary significantly in
+the number of households, but we expect the overall ratios between quantities
+to be similar.
