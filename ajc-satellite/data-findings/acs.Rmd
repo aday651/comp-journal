@@ -31,6 +31,7 @@ library(zoo)
 library(sf)
 library(viridis)
 library(deming)
+library(cluster)
 
 pminmax <- function(x, min_val, max_val) {
     return(pmin(pmax(x, min_val), max_val))
@@ -1244,113 +1245,80 @@ df_income_in_5yr %>%
     guides(fill = "none")
 ```
 
-## Are individuals being forced out?
+<!-- ## Are individuals being forced out?
 
 Before doing anything with the data, we note that there is nothing casual we
 can say here. However, we can describe associations between 
 different income groups;
 here, we investigate whether there is a general association between the change
-in those earning less than $75,000 a year, and those earning $150,000 or more in an area.
-
-From the resulting analysis, we see that there is an association between
-the growth of those earning $150,000 or more a year in a census tract, 
-and the shrinking of those earning $75,000 a year or less. 
+in those earning less than $75,000 a year, and those earning $150,000 or more in an area. -->
 
 ```{r}
-library(deming)
+# df_income_change_corr <- df_income_tracts %>%
+#     filter(variable != "Total") %>%
+#     select(year, GEOID, variable, estimate, moe) %>%
+#     mutate(variable = fct_collapse(variable, 
+#         "Less than $75,000" = c(
+#             "Less than $10,000", "$10,000 to $14,999", 
+#             "$15,000 to $19,999", "$20,000 to $24,999",
+#             "$25,000 to $29,999", "$30,000 to $34,999",
+#             "$35,000 to $39,999", "$40,000 to $44,999",
+#             "$45,000 to $49,999", "$50,000 to $59,999", 
+#             "$60,000 to $74,999"
+#         ),
+#         "$75,000 to $99,999" = c("$75,000 to $99,999"),
+#         "$100,000 to $149,999" = c(
+#             "$100,000 to $124,999", "$125,000 to $149,999"
+#         ),
+#         "$150,000 or more" = c(
+#             "$150,000 to $199,999", "$200,000 or more"
+#             )
+#     )) %>%
+#     mutate(
+#         variable = factor(
+#             variable, ordered = TRUE, 
+#             levels = c(
+#                 "Less than $75,000", "$75,000 to $99,999",
+#                 "$100,000 to $149,999", "$150,000 or more"
+#             )
+#         )
+#     ) %>%
+#     group_by(year, GEOID, variable) %>%
+#     summarize(
+#         estimate = sum(estimate),
+#         moe = sqrt(sum(moe**2))
+#     ) %>%
+#     ungroup() %>%
+#     pivot_wider(
+#         names_from = "year",
+#         values_from = c("estimate", "moe")
+#     ) %>%
+#     mutate(
+#         change = estimate_2019 - estimate_2010,
+#         ratio = estimate_2019 / estimate_2010,
+#         log_ratio_moe = sqrt((moe_2019/estimate_2019)**2 + (moe_2010/estimate_2010)**2)
+#     ) %>%
+#     left_join(df_tracts) %>% 
+#     select(GEOID, variable, ratio, log_ratio_moe) %>%
+#     filter(variable %in% c("Less than $75,000", "$150,000 or more")) %>%
+#     mutate(variable = fct_recode(
+#         variable, "lt_75k" = "Less than $75,000", "gt_150k" = "$150,000 or more"
+#     )) %>%
+#     pivot_wider(
+#         names_from = variable,
+#         values_from = c("ratio", "log_ratio_moe")
+#     )
 
-df_income_change_corr <- df_rdincome_total_change_tracts %>% 
-    select(GEOID, variable, ratio, log_ratio_moe) %>%
-    filter(variable %in% c("Less than $50,000", "$200,000 or more")) %>%
-    mutate(variable = fct_recode(
-        variable, "lt_50k" = "Less than $50,000", "gt_200k" = "$200,000 or more"
-    )) %>%
-    pivot_wider(
-        names_from = variable,
-        values_from = c("ratio", "log_ratio_moe")
-    ) %>%
-    filter(
-        ratio_gt_200k > 0, ratio_gt_200k < Inf,
-        log_ratio_moe_lt_50k < 5, log_ratio_moe_gt_200k < 5
-    )
+# require(deming)
 
-dr <- deming(
-    log(ratio_gt_200k) ~ log(ratio_lt_50k), data = df_income_change_corr,
-    xstd = log_ratio_moe_lt_50k, ystd = log_ratio_moe_gt_200k
-)
-dr
-
-dr2 <- deming(
-    log(ratio_lt_50k) ~ log(ratio_gt_200k), data = df_income_change_corr,
-    ystd = log_ratio_moe_lt_50k, xstd = log_ratio_moe_gt_200k
-)
-dr2
-
-df_income_change_corr <- df_income_tracts %>%
-    filter(variable != "Total") %>%
-    select(year, GEOID, variable, estimate, moe) %>%
-    mutate(variable = fct_collapse(variable, 
-        "Less than $75,000" = c(
-            "Less than $10,000", "$10,000 to $14,999", 
-            "$15,000 to $19,999", "$20,000 to $24,999",
-            "$25,000 to $29,999", "$30,000 to $34,999",
-            "$35,000 to $39,999", "$40,000 to $44,999",
-            "$45,000 to $49,999", "$50,000 to $59,999", 
-            "$60,000 to $74,999"
-        ),
-        "$75,000 to $99,999" = c("$75,000 to $99,999"),
-        "$100,000 to $149,999" = c(
-            "$100,000 to $124,999", "$125,000 to $149,999"
-        ),
-        "$150,000 or more" = c(
-            "$150,000 to $199,999", "$200,000 or more"
-            )
-    )) %>%
-    mutate(
-        variable = factor(
-            variable, ordered = TRUE, 
-            levels = c(
-                "Less than $75,000", "$75,000 to $99,999",
-                "$100,000 to $149,999", "$150,000 or more"
-            )
-        )
-    ) %>%
-    group_by(year, GEOID, variable) %>%
-    summarize(
-        estimate = sum(estimate),
-        moe = sqrt(sum(moe**2))
-    ) %>%
-    ungroup() %>%
-    pivot_wider(
-        names_from = "year",
-        values_from = c("estimate", "moe")
-    ) %>%
-    mutate(
-        change = estimate_2019 - estimate_2010,
-        ratio = estimate_2019 / estimate_2010,
-        log_ratio_moe = sqrt((moe_2019/estimate_2019)**2 + (moe_2010/estimate_2010)**2)
-    ) %>%
-    left_join(df_tracts) %>% 
-    select(GEOID, variable, ratio, log_ratio_moe) %>%
-    filter(variable %in% c("Less than $75,000", "$150,000 or more")) %>%
-    mutate(variable = fct_recode(
-        variable, "lt_75k" = "Less than $75,000", "gt_150k" = "$150,000 or more"
-    )) %>%
-    pivot_wider(
-        names_from = variable,
-        values_from = c("ratio", "log_ratio_moe")
-    )
-
-require(deming)
-
-dr <- deming(
-    log(ratio_lt_75k) ~ log(ratio_gt_150k), 
-    data = df_income_change_corr %>% filter(
-        ratio_gt_150k < 20, ratio_gt_150k > 0.01
-    ),
-    ystd = log_ratio_moe_lt_75k, xstd = log_ratio_moe_gt_150k
-)
-dr
+# dr <- deming(
+#     log(ratio_lt_75k) ~ log(ratio_gt_150k), 
+#     data = df_income_change_corr %>% filter(
+#         ratio_gt_150k < 20, ratio_gt_150k > 0.01
+#     ),
+#     ystd = log_ratio_moe_lt_75k, xstd = log_ratio_moe_gt_150k
+# )
+# dr
 ```
 
 ## Change in number of households earning less than $75,000 in Atlanta and the surrounding area 
@@ -1758,11 +1726,14 @@ df_income_quintiles_change %>%
 
 ## Examining measures of income inequality
 
-The [Gini coefficient](https://en.wikipedia.org/wiki/Gini_coefficient) is a measure of income inequality frequently used. We examine the change in the
+The [Gini coefficient](https://en.wikipedia.org/wiki/Gini_coefficient) is a measure of income inequality frequently used, giving a number between 0
+and 1 (with larger values corresponding to greater inequality). We examine
+the change in the
 estimate Gini coefficient in each census tract, comparing the periods
-between 2006-2010 and 2015-2019, and when doing so, we find that
-there is a statistically significant increase in the Gini coefficient
-generally across tracts when doing so. 
+between 2006-2010 and 2015-2019, and when doing so, we find that there
+has been a statistically significant increase in the Gini coefficient
+generally across tracts, with the Gini coefficient increasing on
+average by 0.014 across tracts. 
 
 ```{r}
 df_gini <- map_dfr(
@@ -1797,6 +1768,7 @@ df_gini_wide <- df_gini %>%
         diff = estimate_gini_2019 - estimate_gini_2010,
         diff_moe = sqrt(moe_gini_2019**2 + moe_gini_2010**2),
         diff_sd = diff_moe / 1.645,
+        z_score = diff / diff_sd, 
         ratio = estimate_gini_2019 / estimate_gini_2010,
         log_ratio_moe = sqrt( (moe_gini_2010 / estimate_gini_2010)**2 + (moe_gini_2019 / estimate_gini_2019)**2  ),
         log_ratio_sd = log_ratio_moe / 1.645
@@ -1810,9 +1782,29 @@ samp_n <- sum(!is.na(df_gini_wide$diff))
 t_stat <- sqrt(samp_n)*mean_est/sqrt(sd1**2 + sd2**2)
 p_val <- pt(t_stat, df = samp_n, lower.tail = FALSE)
 print(paste("p-value of hypothesis test:", p_val))
+
+ggplot() +
+    geom_sf(
+        data = df_tracts %>% left_join(df_gini_wide),
+        aes(geometry = geometry, fill = estimate_gini_2019),
+        colour = "grey", lwd = 0.25
+    ) + scale_fill_viridis(
+        option = "magma"
+    ) + 
+    geom_sf(data = arc_counties_shp, colour = "black", fill = NA) +
+    geom_sf(data = highway_arc, colour = "black", lty = 3, fill = NA) +
+    theme(legend.position = "bottom") +
+    labs(
+        fill = "Gini coefficient",
+        title = "Gini coefficient estimates over 2015-2019 across Atlanta",
+        subtitle = "(Data using ACS 2015-2019 estimates)"
+    ) +
+    theme(legend.key.width = unit(2, 'cm'))
 ```
 
 # Incorporating land-use change data
+
+## Change from 2008 to 2019
 
 ```{r}
 land_use_labels <- read_csv("data-files/ncld_class_labels.csv") %>%
@@ -1845,7 +1837,8 @@ land_use_change %>%
     ggplot(aes(x = tv_dist)) + geom_histogram() +
     labs(
         x = "Total variation change in land use proportions of tract",
-        y = "Number of census tracts"
+        y = "Number of census tracts",
+        subtitle = "Examining 2008 vs 2019"
     )
 
 land_use_change_shp <- land_use_change %>%
@@ -1899,6 +1892,85 @@ land_use_plot +
     coord_sf(xlim = c(-84.53, -84.2), ylim = c(33.6, 33.95), expand = FALSE)
 
 ggsave("img-files/land_use_change_itp.pdf")
+```
+
+## Change from 2001 to 2019
+
+```{r}
+land_use_change_2001 <- land_use_df %>% 
+    filter(year %in% c(2001, 2019)) %>%
+    group_by(GEOID, year) %>%
+    mutate(value = value / sum(value)) %>%
+    ungroup() %>%
+    pivot_wider(
+        names_from = year,
+        values_from = value,
+        names_prefix = "value_"
+    ) %>%
+    mutate(abs_diff = abs(value_2019 - value_2001)) %>%
+    group_by(GEOID) %>%
+    summarize(tv_dist = 0.5 * sum(abs_diff))
+
+land_use_change_2001 %>%
+    ggplot(aes(x = tv_dist)) + geom_histogram() +
+    labs(
+        x = "Total variation change in land use proportions of tract",
+        y = "Number of census tracts",
+        subtitle = "Examining 2001 vs 2019"
+    )
+
+land_use_change_shp_2001 <- land_use_change_2001 %>%
+    mutate(GEOID = as.character(GEOID)) %>%
+    left_join(df_tracts)
+
+land_use_plot <- ggplot() +
+    geom_sf(
+        data = land_use_change_shp_2001 %>%
+        mutate(tv_dist = pminmax(tv_dist, 0, 0.15)),
+        aes(geometry = geometry, fill = tv_dist),
+        colour = "grey", lwd = 0.25
+    ) + scale_fill_viridis(
+        option = "viridis",
+        labels = c("0", "0.05", "0.10", "0.15+")
+    ) + 
+    geom_sf(data = arc_counties_shp, colour = "black", fill = NA) +
+    geom_sf(data = highway_arc, colour = "black", lty = 3, fill = NA) +
+    theme(legend.position = "bottom") +
+    labs(
+        fill = "Overall change in land type",
+        title = "Total variation between type of land use between 2001 and 2019",
+        subtitle = "(Data using NCLD National Land Cover Database)"
+    ) +
+    theme(legend.key.width = unit(2, 'cm'))
+
+land_use_plot
+ggsave("img-files/land_use_change_2001.pdf")
+
+land_use_plot_outliers <- ggplot() +
+    geom_sf(
+        data = land_use_change_shp_2001,
+        aes(geometry = geometry, fill = pminmax(tv_dist, 0, 0.3)),
+        colour = "grey", lwd = 0.25
+    ) + scale_fill_viridis(
+        option = "viridis"
+    ) + 
+    geom_sf(data = arc_counties_shp, colour = "black", fill = NA) +
+    geom_sf(data = highway_arc, colour = "black", lty = 3, fill = NA) +
+    theme(legend.position = "bottom") +
+    labs(
+        fill = "Overall change in land type\n(Truncated at 0.3)",
+        title = "Total variation between type of land use between 2001 and 2019",
+        subtitle = "(Data using NCLD National Land Cover Database)"
+    ) +
+    theme(legend.key.width = unit(2, 'cm'))
+
+land_use_plot_outliers
+
+land_use_plot + 
+    coord_sf(xlim = c(-84.53, -84.2), ylim = c(33.6, 33.95), expand = FALSE)
+
+ggsave("img-files/land_use_change_itp_2001.pdf")
+
 ```
 
 ## Looking at reduced classes (merging together the non-developed types into one category)
@@ -1999,27 +2071,139 @@ land_use_df %>%
 
 ## Clustering similar types of land together, examining changes
 
+To interpret the types of land better, we fit a K-mediods clustering
+algorithm to the vector of proportions of land use, after having
+reduced the number of classes slightly - for example, we our purposes
+we do not need three different types of forest class. To decide on the
+number of clusters, we used a gap statistic to decide on an appriopate
+number of clusters, which gave the choice of 8 clusters. The clusters
+were labelled according to the mediods of the clusters; we then plot
+the cluster assignments by tract across 2001 and 2019. 
+Overall, 287 of the
+783 areas considering changed in their type of use. 
+
 ```{r}
 land_use_cluster <- land_use_df %>% 
-    filter(year %in% c(2008, 2019)) %>%
+    filter(year %in% c(2001, 2019)) %>%
+    filter(class != 0) %>%
+    mutate(class = fct_collapse(factor(class),
+        "1X" = c("11", "12"),
+        "21" = "21",
+        "22" = "22",
+        "23" = "23",
+        "24" = "24",
+        "31" = "31",
+        "4X" = c("41", "42", "43"),
+        "5X" = c("51", "52"),
+        "7X" = c("71", "72", "73", "74"),
+        "8X" = c("81", "82"),
+        "9X" = c("90", "95")
+    )) %>%
+    group_by(GEOID, year, class) %>%
+    summarize(value = sum(value)) %>%
     group_by(GEOID, year) %>%
     mutate(value = value / sum(value)) %>%
-    ungroup() %>%
+    ungroup()  %>%
     pivot_wider(
         names_from = class,
         values_from = value,
         names_prefix = "class_"
-    ) %>%
-    select(-class_0)
+    )
+```
 
-library(cluster)
+```{r, eval = FALSE}
+cg <- clusGap(
+    land_use_cluster[, 3:13], clara, samples = 100,
+    K.max = 15, B = 100
+)
 
-clara(
-    land_use_cluster[, 3:17], 5, metric = "manhattan",
+print(cg)
+
+land_clusters <- clara(
+    land_use_cluster[, 3:13], 8, metric = "manhattan",
     samples = 100
+)
+
+print(land_clusters)
+
+write_csv(
+    as_tibble(land_clusters$medoids), 
+    "data-files/cluster_mediods.csv"
+)
+
+write_csv(
+    as_tibble(land_clusters$clustering), 
+    "data-files/cluster-assignments.csv"
 )
 ```
 
+```{r}
+cluster_mediods <- read_csv(
+    "data-files/cluster_mediods.csv"
+)
+
+cluster_assignments <- read_csv(
+    "data-files/cluster-assignments.csv"
+)
+
+cluster_mediods
+land_use_labels %>% print(n = Inf)
+
+land_use_cluster %>%
+    cbind(cluster_assignments) %>%
+    mutate(cluster = value) %>%
+    select(GEOID, year, cluster) %>%
+    pivot_wider(
+        names_from = year,
+        values_from = cluster,
+        names_prefix = "cluster_"
+    ) %>%
+    summarize(changed_tracts = sum(cluster_2001 != cluster_2019))
+
+land_use_cluster_classes <- land_use_cluster %>%
+    cbind(cluster_assignments) %>%
+    mutate(cluster = value, GEOID = as.character(GEOID)) %>%
+    mutate( 
+        cluster = fct_recode(factor(cluster),
+        "Mostly forest / farmland" = "1", 
+        "Mostly forest / some developed open + low intensity space" = "2", 
+        "Mostly developed open + low intensity / some forest" = "3", 
+        "Mostly developed space (all intensities) / some forest" = "4", 
+        "Mostly developed open + low intensity, little medium/high" = "5", 
+        "Mostly developed open + low intensity, some medium/high" = "6", 
+        "Mostly developed space (all intensities)" = "7", 
+        "Mostly medium to high intensity developed space" = "8",
+    )) %>%
+    select(GEOID, year, cluster)
+
+pal <- c(
+    "#4EB265", "#CAE0AB",
+    "#F7F056", "#EE8026", 
+    "#7BAFDE", "#1965B0",
+    "#882E72", "#DC050C"
+)
+
+ggplot() +
+    geom_sf(
+        data = land_use_cluster_classes %>% left_join(df_tracts),
+        aes(geometry = geometry, fill = cluster),
+        colour = "grey", lwd = 0.25
+    ) + 
+    geom_sf(data = arc_counties_shp, colour = "black", fill = NA) +
+    geom_sf(data = highway_arc, colour = "black", lty = 3, fill = NA) +
+    facet_wrap( ~ year) + scale_fill_manual(values = pal) +
+    theme(
+        legend.position = "bottom",
+        legend.direction = "vertical"
+    ) + guides(fill = guide_legend(ncol = 2)) +
+    labs(
+        fill = "Type of land",
+        title = "Classification of type of land use in 2001 and 2019",
+        subtitle = "(Data using NCLD National Land Cover Database)"
+    )
+
+ggsave("img-files/land_use_change_2001_2019_clusters.pdf")
+```
 
 # Appendix
 
