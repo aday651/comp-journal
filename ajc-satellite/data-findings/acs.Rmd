@@ -207,6 +207,45 @@ ggplot() +
 
 # Household income distribution in the Atlanta metro area between 2009 and 2019
 
+```{r}
+# df <- map_dfr(
+#     years_acs1,
+#     ~ get_acs(
+#         geography = "county",
+#         state = "GA",
+#         variables = "B19013_001",
+#         year = .x,
+#         county = arc_counties,
+#         survey = "acs1",
+#         geometry = FALSE
+#     ),
+#     .id = "year") %>%
+#     mutate(
+#         county = gsub("^(.*?),.*", "\\1", NAME)
+#     ) %>% select(-NAME) %>% relocate(county, .after = GEOID)
+
+# income_adjust <- tibble(
+#     year = as.character(2009:2021),
+#     factors = c(315.2, 320.4, 330.5, 337.5, 342.5,
+#     348.3, 348.9, 353.4, 361.0, 369.8, 376.5, 381.2, 399.0)
+# )
+
+# df2 <- df %>% left_join(income_adjust) %>%
+#     mutate(estimate = estimate * max(factors)/factors)
+
+# df2 %>% 
+#     filter(year %in% c("2009", "2019")) %>%
+#     filter(county %in% c(
+#         "Fulton County", "DeKalb County", "Gwinnett County",
+#         "Cobb County", "Clayton County"
+#     )) %>% select(year, county, estimate) %>%
+#     rename(median_income_2019_adjusted = estimate)
+
+# df2 %>%
+#     ggplot(aes(x = year, y = estimate, group = county, col = county)) +
+#     geom_line()
+```
+
 ```{r, include = FALSE}
 v11 <- load_variables(2011, "acs1", cache = TRUE)
 
@@ -1662,7 +1701,63 @@ df_rent_upper_quartile <- map_dfr(
         ratio_adjusting_for_inflation = rent_2020 / (rent_2010 * 1.19)
     )
 
-df_rent_upper_quartile
+df_rent_all_quantiles <- map_dfr(
+    lst(2010, 2020),
+    ~ get_acs(
+        geography = "county",
+        state = "GA",
+        variables = c(
+            lower = "B25057_001",
+            median = "B25058_001",
+            upper = "B25059_001"
+        ),
+        year = .x,
+        county = arc_counties,
+        survey = "acs5",
+        geometry = FALSE
+    ),
+    .id = "year") %>%
+    mutate(
+        county = gsub("^(.*?),.*", "\\1", NAME)
+    ) %>% 
+    select(-NAME) %>% 
+    relocate(county, .after = GEOID) %>%
+    select(year, county, variable, estimate, moe) %>%
+    mutate(
+        estimate = estimate * ifelse(year == "2010", 1.2, 1),
+        moe = moe * ifelse(year == "2010", 1.2, 1)
+    ) %>%
+    rename(dollars_2020_adjusted = estimate, quantile = variable)
+
+write_csv(df_rent_all_quantiles, "data-files/rent_quantiles.csv")
+
+df_rent_all_quantiles %>%
+    filter(quantile == "median") %>%
+    ggplot(aes(x = county, y = dollars_2020_adjusted, fill = year)) +
+    geom_col(position = "dodge") +
+    geom_errorbar(
+        aes(
+            ymin = dollars_2020_adjusted - moe, 
+            ymax = dollars_2020_adjusted + moe
+        ),
+        position = "dodge"
+    ) +
+    scale_fill_manual(values = cbPalette) + 
+    geom_text(
+        aes(label = year, y = 10), 
+        position = position_dodge(width = 1),
+        size = 5, hjust = 'left',
+        col = "white"
+    ) +
+    labs(
+        x = "County", y = "Median rent in 2020-inflation adjusted dollars", fill = "Year",
+        title = "Median rent in Atlanta by county between 2006-2010 and 2016-2020",
+        subtitle = "Data from the 5-year ACS for 2006-2010 and 2016-2020"
+    ) +
+    coord_flip() + 
+    theme(legend.position = "none")
+    
+ggsave("img-files/median_rent_counties.pdf")
 ```
 
 ## Examining quintiles of earnings
@@ -2163,7 +2258,8 @@ land_use_cluster %>%
 land_use_cluster_classes <- land_use_cluster %>%
     cbind(cluster_assignments) %>%
     mutate(cluster = value, GEOID = as.character(GEOID)) %>%
-    mutate( 
+    mutate(
+        cluster_labels = cluster,
         cluster = fct_recode(factor(cluster),
         "Mostly forest / farmland" = "1", 
         "Mostly forest / some developed open + low intensity space" = "2", 
@@ -2174,7 +2270,7 @@ land_use_cluster_classes <- land_use_cluster %>%
         "Mostly developed space (all intensities)" = "7", 
         "Mostly medium to high intensity developed space" = "8",
     )) %>%
-    select(GEOID, year, cluster)
+    select(GEOID, year, cluster, cluster_labels)
 
 pal <- c(
     "#4EB265", "#CAE0AB",

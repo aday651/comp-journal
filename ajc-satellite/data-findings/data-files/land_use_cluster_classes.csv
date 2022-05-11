@@ -1,0 +1,1567 @@
+GEOID,year,cluster,cluster_labels
+13057090100,2001,Mostly forest / farmland,1
+13057090100,2019,Mostly forest / farmland,1
+13057090200,2001,Mostly forest / farmland,1
+13057090200,2019,Mostly forest / farmland,1
+13057090300,2001,Mostly forest / farmland,1
+13057090300,2019,Mostly forest / farmland,1
+13057090400,2001,Mostly forest / farmland,1
+13057090400,2019,Mostly forest / farmland,1
+13057090501,2001,Mostly forest / farmland,1
+13057090501,2019,Mostly forest / farmland,1
+13057090502,2001,Mostly forest / farmland,1
+13057090502,2019,Mostly forest / farmland,1
+13057090601,2001,Mostly forest / farmland,1
+13057090601,2019,Mostly forest / some developed open + low intensity space,2
+13057090602,2001,Mostly forest / farmland,1
+13057090602,2019,Mostly forest / farmland,1
+13057090701,2001,Mostly forest / farmland,1
+13057090701,2019,Mostly forest / some developed open + low intensity space,2
+13057090702,2001,Mostly forest / some developed open + low intensity space,2
+13057090702,2019,Mostly forest / some developed open + low intensity space,2
+13057090802,2001,Mostly forest / farmland,1
+13057090802,2019,Mostly forest / farmland,1
+13057090803,2001,Mostly forest / farmland,1
+13057090803,2019,Mostly forest / some developed open + low intensity space,2
+13057090804,2001,Mostly forest / farmland,1
+13057090804,2019,Mostly forest / farmland,1
+13057090901,2001,Mostly forest / farmland,1
+13057090901,2019,Mostly forest / some developed open + low intensity space,2
+13057090902,2001,Mostly forest / farmland,1
+13057090902,2019,Mostly developed open + low intensity / some forest,3
+13057090904,2001,Mostly forest / some developed open + low intensity space,2
+13057090904,2019,Mostly developed open + low intensity / some forest,3
+13057090905,2001,Mostly developed open + low intensity / some forest,3
+13057090905,2019,Mostly developed open + low intensity / some forest,3
+13057091001,2001,Mostly forest / some developed open + low intensity space,2
+13057091001,2019,Mostly developed space (all intensities) / some forest,4
+13057091003,2001,Mostly developed open + low intensity / some forest,3
+13057091003,2019,Mostly developed open + low intensity / some forest,3
+13057091005,2001,Mostly developed open + low intensity / some forest,3
+13057091005,2019,Mostly developed open + low intensity / some forest,3
+13057091006,2001,"Mostly developed open + low intensity, little medium/high",5
+13057091006,2019,"Mostly developed open + low intensity, some medium/high",6
+13057091007,2001,Mostly forest / some developed open + low intensity space,2
+13057091007,2019,Mostly forest / some developed open + low intensity space,2
+13057091008,2001,Mostly forest / some developed open + low intensity space,2
+13057091008,2019,Mostly forest / some developed open + low intensity space,2
+13057091101,2001,Mostly forest / some developed open + low intensity space,2
+13057091101,2019,Mostly forest / some developed open + low intensity space,2
+13057091102,2001,Mostly forest / some developed open + low intensity space,2
+13057091102,2019,Mostly developed open + low intensity / some forest,3
+13057091103,2001,Mostly forest / farmland,1
+13057091103,2019,Mostly forest / some developed open + low intensity space,2
+13063040202,2001,Mostly developed space (all intensities),7
+13063040202,2019,Mostly medium to high intensity developed space,8
+13063040203,2001,Mostly forest / some developed open + low intensity space,2
+13063040203,2019,Mostly forest / some developed open + low intensity space,2
+13063040204,2001,Mostly developed space (all intensities),7
+13063040204,2019,Mostly developed space (all intensities),7
+13063040302,2001,Mostly developed space (all intensities) / some forest,4
+13063040302,2019,Mostly developed space (all intensities) / some forest,4
+13063040303,2001,Mostly developed space (all intensities),7
+13063040303,2019,Mostly developed space (all intensities),7
+13063040306,2001,Mostly medium to high intensity developed space,8
+13063040306,2019,Mostly medium to high intensity developed space,8
+13063040307,2001,Mostly developed open + low intensity / some forest,3
+13063040307,2019,"Mostly developed open + low intensity, little medium/high",5
+13063040308,2001,Mostly medium to high intensity developed space,8
+13063040308,2019,Mostly medium to high intensity developed space,8
+13063040407,2001,Mostly developed space (all intensities) / some forest,4
+13063040407,2019,Mostly developed space (all intensities),7
+13063040408,2001,Mostly forest / some developed open + low intensity space,2
+13063040408,2019,Mostly developed open + low intensity / some forest,3
+13063040409,2001,"Mostly developed open + low intensity, some medium/high",6
+13063040409,2019,"Mostly developed open + low intensity, some medium/high",6
+13063040410,2001,Mostly developed space (all intensities) / some forest,4
+13063040410,2019,Mostly developed space (all intensities) / some forest,4
+13063040411,2001,Mostly forest / some developed open + low intensity space,2
+13063040411,2019,Mostly forest / some developed open + low intensity space,2
+13063040412,2001,Mostly developed space (all intensities),7
+13063040412,2019,Mostly developed space (all intensities),7
+13063040413,2001,Mostly developed open + low intensity / some forest,3
+13063040413,2019,Mostly developed open + low intensity / some forest,3
+13063040414,2001,Mostly developed space (all intensities),7
+13063040414,2019,Mostly developed space (all intensities),7
+13063040415,2001,Mostly developed space (all intensities),7
+13063040415,2019,Mostly developed space (all intensities),7
+13063040416,2001,Mostly developed open + low intensity / some forest,3
+13063040416,2019,Mostly developed open + low intensity / some forest,3
+13063040417,2001,Mostly developed space (all intensities),7
+13063040417,2019,Mostly medium to high intensity developed space,8
+13063040509,2001,Mostly developed open + low intensity / some forest,3
+13063040509,2019,"Mostly developed open + low intensity, little medium/high",5
+13063040510,2001,"Mostly developed open + low intensity, some medium/high",6
+13063040510,2019,"Mostly developed open + low intensity, some medium/high",6
+13063040512,2001,Mostly developed open + low intensity / some forest,3
+13063040512,2019,Mostly developed open + low intensity / some forest,3
+13063040513,2001,Mostly forest / some developed open + low intensity space,2
+13063040513,2019,Mostly developed open + low intensity / some forest,3
+13063040514,2001,Mostly developed open + low intensity / some forest,3
+13063040514,2019,Mostly developed open + low intensity / some forest,3
+13063040515,2001,Mostly developed open + low intensity / some forest,3
+13063040515,2019,Mostly developed open + low intensity / some forest,3
+13063040516,2001,"Mostly developed open + low intensity, some medium/high",6
+13063040516,2019,"Mostly developed open + low intensity, some medium/high",6
+13063040518,2001,"Mostly developed open + low intensity, little medium/high",5
+13063040518,2019,Mostly developed open + low intensity / some forest,3
+13063040519,2001,Mostly developed space (all intensities) / some forest,4
+13063040519,2019,Mostly developed open + low intensity / some forest,3
+13063040520,2001,Mostly developed space (all intensities) / some forest,4
+13063040520,2019,Mostly developed space (all intensities),7
+13063040521,2001,Mostly developed open + low intensity / some forest,3
+13063040521,2019,"Mostly developed open + low intensity, some medium/high",6
+13063040522,2001,Mostly developed space (all intensities) / some forest,4
+13063040522,2019,Mostly developed space (all intensities),7
+13063040523,2001,Mostly developed space (all intensities) / some forest,4
+13063040523,2019,Mostly developed space (all intensities),7
+13063040524,2001,Mostly developed open + low intensity / some forest,3
+13063040524,2019,Mostly developed open + low intensity / some forest,3
+13063040525,2001,Mostly developed open + low intensity / some forest,3
+13063040525,2019,Mostly developed open + low intensity / some forest,3
+13063040526,2001,Mostly developed open + low intensity / some forest,3
+13063040526,2019,Mostly developed open + low intensity / some forest,3
+13063040606,2001,Mostly forest / farmland,1
+13063040606,2019,Mostly forest / farmland,1
+13063040608,2001,Mostly forest / farmland,1
+13063040608,2019,Mostly forest / farmland,1
+13063040609,2001,Mostly forest / some developed open + low intensity space,2
+13063040609,2019,Mostly developed open + low intensity / some forest,3
+13063040611,2001,Mostly developed space (all intensities),7
+13063040611,2019,Mostly developed space (all intensities),7
+13063040612,2001,Mostly developed space (all intensities) / some forest,4
+13063040612,2019,Mostly developed space (all intensities),7
+13063040613,2001,Mostly forest / some developed open + low intensity space,2
+13063040613,2019,Mostly forest / some developed open + low intensity space,2
+13063040614,2001,Mostly forest / some developed open + low intensity space,2
+13063040614,2019,Mostly developed open + low intensity / some forest,3
+13063040615,2001,Mostly forest / some developed open + low intensity space,2
+13063040615,2019,Mostly forest / some developed open + low intensity space,2
+13063040616,2001,Mostly developed open + low intensity / some forest,3
+13063040616,2019,Mostly developed open + low intensity / some forest,3
+13063040617,2001,Mostly developed space (all intensities) / some forest,4
+13063040617,2019,Mostly developed space (all intensities) / some forest,4
+13063040619,2001,Mostly forest / some developed open + low intensity space,2
+13063040619,2019,Mostly developed open + low intensity / some forest,3
+13063040620,2001,Mostly forest / farmland,1
+13063040620,2019,Mostly forest / some developed open + low intensity space,2
+13063040621,2001,Mostly forest / some developed open + low intensity space,2
+13063040621,2019,Mostly developed open + low intensity / some forest,3
+13063040622,2001,Mostly forest / some developed open + low intensity space,2
+13063040622,2019,Mostly developed open + low intensity / some forest,3
+13063980000,2001,Mostly medium to high intensity developed space,8
+13063980000,2019,Mostly medium to high intensity developed space,8
+13067030101,2001,Mostly forest / farmland,1
+13067030101,2019,Mostly forest / farmland,1
+13067030103,2001,Mostly forest / some developed open + low intensity space,2
+13067030103,2019,Mostly developed space (all intensities) / some forest,4
+13067030104,2001,Mostly forest / some developed open + low intensity space,2
+13067030104,2019,Mostly developed open + low intensity / some forest,3
+13067030106,2001,Mostly developed space (all intensities),7
+13067030106,2019,"Mostly developed open + low intensity, some medium/high",6
+13067030107,2001,Mostly forest / some developed open + low intensity space,2
+13067030107,2019,Mostly developed open + low intensity / some forest,3
+13067030209,2001,Mostly forest / farmland,1
+13067030209,2019,Mostly forest / some developed open + low intensity space,2
+13067030214,2001,Mostly forest / some developed open + low intensity space,2
+13067030214,2019,Mostly forest / some developed open + low intensity space,2
+13067030215,2001,Mostly developed open + low intensity / some forest,3
+13067030215,2019,"Mostly developed open + low intensity, little medium/high",5
+13067030218,2001,Mostly forest / farmland,1
+13067030218,2019,Mostly forest / some developed open + low intensity space,2
+13067030219,2001,Mostly forest / farmland,1
+13067030219,2019,Mostly forest / some developed open + low intensity space,2
+13067030220,2001,Mostly developed open + low intensity / some forest,3
+13067030220,2019,Mostly developed open + low intensity / some forest,3
+13067030222,2001,"Mostly developed open + low intensity, little medium/high",5
+13067030222,2019,"Mostly developed open + low intensity, little medium/high",5
+13067030223,2001,Mostly developed open + low intensity / some forest,3
+13067030223,2019,Mostly developed open + low intensity / some forest,3
+13067030224,2001,Mostly developed open + low intensity / some forest,3
+13067030224,2019,Mostly developed space (all intensities),7
+13067030226,2001,Mostly developed space (all intensities) / some forest,4
+13067030226,2019,Mostly developed space (all intensities),7
+13067030227,2001,Mostly developed space (all intensities),7
+13067030227,2019,Mostly developed space (all intensities),7
+13067030228,2001,Mostly developed space (all intensities) / some forest,4
+13067030228,2019,Mostly developed space (all intensities),7
+13067030229,2001,Mostly developed space (all intensities),7
+13067030229,2019,Mostly developed space (all intensities),7
+13067030230,2001,Mostly forest / farmland,1
+13067030230,2019,Mostly developed space (all intensities) / some forest,4
+13067030231,2001,Mostly forest / some developed open + low intensity space,2
+13067030231,2019,Mostly forest / some developed open + low intensity space,2
+13067030232,2001,Mostly forest / farmland,1
+13067030232,2019,Mostly forest / some developed open + low intensity space,2
+13067030233,2001,Mostly forest / some developed open + low intensity space,2
+13067030233,2019,Mostly forest / some developed open + low intensity space,2
+13067030234,2001,Mostly forest / farmland,1
+13067030234,2019,Mostly forest / some developed open + low intensity space,2
+13067030235,2001,Mostly forest / farmland,1
+13067030235,2019,Mostly forest / some developed open + low intensity space,2
+13067030236,2001,Mostly forest / some developed open + low intensity space,2
+13067030236,2019,Mostly developed open + low intensity / some forest,3
+13067030238,2001,Mostly forest / farmland,1
+13067030238,2019,Mostly forest / some developed open + low intensity space,2
+13067030239,2001,Mostly forest / farmland,1
+13067030239,2019,Mostly forest / some developed open + low intensity space,2
+13067030310,2001,Mostly developed open + low intensity / some forest,3
+13067030310,2019,Mostly developed open + low intensity / some forest,3
+13067030311,2001,Mostly developed open + low intensity / some forest,3
+13067030311,2019,Mostly developed open + low intensity / some forest,3
+13067030312,2001,"Mostly developed open + low intensity, little medium/high",5
+13067030312,2019,"Mostly developed open + low intensity, little medium/high",5
+13067030313,2001,Mostly developed open + low intensity / some forest,3
+13067030313,2019,Mostly developed open + low intensity / some forest,3
+13067030314,2001,Mostly developed open + low intensity / some forest,3
+13067030314,2019,"Mostly developed open + low intensity, little medium/high",5
+13067030318,2001,Mostly developed open + low intensity / some forest,3
+13067030318,2019,Mostly developed open + low intensity / some forest,3
+13067030319,2001,Mostly forest / farmland,1
+13067030319,2019,Mostly forest / farmland,1
+13067030320,2001,Mostly forest / farmland,1
+13067030320,2019,Mostly forest / some developed open + low intensity space,2
+13067030322,2001,Mostly forest / some developed open + low intensity space,2
+13067030322,2019,"Mostly developed open + low intensity, little medium/high",5
+13067030324,2001,Mostly developed open + low intensity / some forest,3
+13067030324,2019,Mostly developed open + low intensity / some forest,3
+13067030326,2001,Mostly forest / some developed open + low intensity space,2
+13067030326,2019,Mostly forest / some developed open + low intensity space,2
+13067030327,2001,"Mostly developed open + low intensity, little medium/high",5
+13067030327,2019,"Mostly developed open + low intensity, little medium/high",5
+13067030328,2001,"Mostly developed open + low intensity, little medium/high",5
+13067030328,2019,"Mostly developed open + low intensity, little medium/high",5
+13067030329,2001,"Mostly developed open + low intensity, little medium/high",5
+13067030329,2019,"Mostly developed open + low intensity, little medium/high",5
+13067030330,2001,"Mostly developed open + low intensity, little medium/high",5
+13067030330,2019,"Mostly developed open + low intensity, little medium/high",5
+13067030331,2001,Mostly forest / some developed open + low intensity space,2
+13067030331,2019,"Mostly developed open + low intensity, little medium/high",5
+13067030332,2001,"Mostly developed open + low intensity, little medium/high",5
+13067030332,2019,"Mostly developed open + low intensity, little medium/high",5
+13067030333,2001,"Mostly developed open + low intensity, little medium/high",5
+13067030333,2019,"Mostly developed open + low intensity, little medium/high",5
+13067030334,2001,"Mostly developed open + low intensity, little medium/high",5
+13067030334,2019,"Mostly developed open + low intensity, some medium/high",6
+13067030335,2001,"Mostly developed open + low intensity, little medium/high",5
+13067030335,2019,"Mostly developed open + low intensity, little medium/high",5
+13067030336,2001,Mostly developed open + low intensity / some forest,3
+13067030336,2019,"Mostly developed open + low intensity, little medium/high",5
+13067030337,2001,"Mostly developed open + low intensity, little medium/high",5
+13067030337,2019,"Mostly developed open + low intensity, little medium/high",5
+13067030339,2001,Mostly developed space (all intensities) / some forest,4
+13067030339,2019,Mostly developed space (all intensities) / some forest,4
+13067030340,2001,Mostly developed open + low intensity / some forest,3
+13067030340,2019,Mostly developed open + low intensity / some forest,3
+13067030341,2001,Mostly forest / some developed open + low intensity space,2
+13067030341,2019,"Mostly developed open + low intensity, little medium/high",5
+13067030342,2001,"Mostly developed open + low intensity, little medium/high",5
+13067030342,2019,"Mostly developed open + low intensity, little medium/high",5
+13067030343,2001,Mostly developed open + low intensity / some forest,3
+13067030343,2019,"Mostly developed open + low intensity, little medium/high",5
+13067030344,2001,Mostly developed space (all intensities),7
+13067030344,2019,Mostly medium to high intensity developed space,8
+13067030345,2001,Mostly developed space (all intensities),7
+13067030345,2019,Mostly medium to high intensity developed space,8
+13067030405,2001,"Mostly developed open + low intensity, some medium/high",6
+13067030405,2019,"Mostly developed open + low intensity, some medium/high",6
+13067030407,2001,"Mostly developed open + low intensity, little medium/high",5
+13067030407,2019,"Mostly developed open + low intensity, little medium/high",5
+13067030408,2001,"Mostly developed open + low intensity, little medium/high",5
+13067030408,2019,"Mostly developed open + low intensity, little medium/high",5
+13067030409,2001,"Mostly developed open + low intensity, little medium/high",5
+13067030409,2019,"Mostly developed open + low intensity, little medium/high",5
+13067030410,2001,Mostly developed open + low intensity / some forest,3
+13067030410,2019,Mostly developed open + low intensity / some forest,3
+13067030411,2001,Mostly medium to high intensity developed space,8
+13067030411,2019,Mostly medium to high intensity developed space,8
+13067030412,2001,Mostly medium to high intensity developed space,8
+13067030412,2019,Mostly medium to high intensity developed space,8
+13067030413,2001,Mostly developed space (all intensities),7
+13067030413,2019,Mostly developed space (all intensities),7
+13067030414,2001,Mostly medium to high intensity developed space,8
+13067030414,2019,Mostly medium to high intensity developed space,8
+13067030502,2001,Mostly developed space (all intensities),7
+13067030502,2019,Mostly developed space (all intensities),7
+13067030504,2001,Mostly developed open + low intensity / some forest,3
+13067030504,2019,Mostly developed open + low intensity / some forest,3
+13067030505,2001,Mostly developed space (all intensities),7
+13067030505,2019,Mostly developed space (all intensities),7
+13067030506,2001,Mostly developed open + low intensity / some forest,3
+13067030506,2019,Mostly developed space (all intensities),7
+13067030507,2001,Mostly developed open + low intensity / some forest,3
+13067030507,2019,Mostly developed open + low intensity / some forest,3
+13067030601,2001,Mostly developed space (all intensities) / some forest,4
+13067030601,2019,Mostly developed space (all intensities) / some forest,4
+13067030602,2001,Mostly forest / farmland,1
+13067030602,2019,Mostly forest / some developed open + low intensity space,2
+13067030700,2001,Mostly developed space (all intensities),7
+13067030700,2019,Mostly developed space (all intensities),7
+13067030800,2001,Mostly developed space (all intensities),7
+13067030800,2019,Mostly developed space (all intensities),7
+13067030901,2001,Mostly forest / some developed open + low intensity space,2
+13067030901,2019,Mostly forest / some developed open + low intensity space,2
+13067030902,2001,"Mostly developed open + low intensity, little medium/high",5
+13067030902,2019,"Mostly developed open + low intensity, some medium/high",6
+13067030904,2001,Mostly developed open + low intensity / some forest,3
+13067030904,2019,"Mostly developed open + low intensity, some medium/high",6
+13067030905,2001,Mostly developed open + low intensity / some forest,3
+13067030905,2019,Mostly developed open + low intensity / some forest,3
+13067031001,2001,Mostly developed space (all intensities),7
+13067031001,2019,Mostly developed space (all intensities),7
+13067031002,2001,Mostly developed open + low intensity / some forest,3
+13067031002,2019,Mostly developed open + low intensity / some forest,3
+13067031004,2001,"Mostly developed open + low intensity, some medium/high",6
+13067031004,2019,"Mostly developed open + low intensity, some medium/high",6
+13067031005,2001,Mostly forest / some developed open + low intensity space,2
+13067031005,2019,Mostly developed open + low intensity / some forest,3
+13067031101,2001,"Mostly developed open + low intensity, some medium/high",6
+13067031101,2019,Mostly developed space (all intensities),7
+13067031106,2001,Mostly developed open + low intensity / some forest,3
+13067031106,2019,Mostly developed open + low intensity / some forest,3
+13067031108,2001,"Mostly developed open + low intensity, some medium/high",6
+13067031108,2019,"Mostly developed open + low intensity, some medium/high",6
+13067031110,2001,"Mostly developed open + low intensity, some medium/high",6
+13067031110,2019,"Mostly developed open + low intensity, some medium/high",6
+13067031111,2001,Mostly developed space (all intensities),7
+13067031111,2019,Mostly developed space (all intensities),7
+13067031112,2001,"Mostly developed open + low intensity, little medium/high",5
+13067031112,2019,"Mostly developed open + low intensity, little medium/high",5
+13067031113,2001,Mostly developed space (all intensities),7
+13067031113,2019,Mostly medium to high intensity developed space,8
+13067031114,2001,Mostly developed space (all intensities),7
+13067031114,2019,Mostly developed space (all intensities),7
+13067031115,2001,Mostly developed open + low intensity / some forest,3
+13067031115,2019,"Mostly developed open + low intensity, little medium/high",5
+13067031116,2001,"Mostly developed open + low intensity, some medium/high",6
+13067031116,2019,"Mostly developed open + low intensity, some medium/high",6
+13067031117,2001,Mostly developed open + low intensity / some forest,3
+13067031117,2019,Mostly developed open + low intensity / some forest,3
+13067031118,2001,Mostly developed open + low intensity / some forest,3
+13067031118,2019,Mostly developed open + low intensity / some forest,3
+13067031205,2001,Mostly developed space (all intensities),7
+13067031205,2019,Mostly developed space (all intensities),7
+13067031206,2001,Mostly developed space (all intensities),7
+13067031206,2019,Mostly developed space (all intensities),7
+13067031207,2001,Mostly developed space (all intensities),7
+13067031207,2019,Mostly developed space (all intensities),7
+13067031208,2001,Mostly developed space (all intensities),7
+13067031208,2019,Mostly developed space (all intensities),7
+13067031209,2001,"Mostly developed open + low intensity, some medium/high",6
+13067031209,2019,"Mostly developed open + low intensity, some medium/high",6
+13067031211,2001,Mostly developed space (all intensities),7
+13067031211,2019,Mostly developed space (all intensities),7
+13067031212,2001,"Mostly developed open + low intensity, little medium/high",5
+13067031212,2019,Mostly developed open + low intensity / some forest,3
+13067031306,2001,Mostly developed open + low intensity / some forest,3
+13067031306,2019,Mostly developed open + low intensity / some forest,3
+13067031307,2001,Mostly forest / some developed open + low intensity space,2
+13067031307,2019,Mostly forest / some developed open + low intensity space,2
+13067031308,2001,Mostly developed open + low intensity / some forest,3
+13067031308,2019,Mostly developed open + low intensity / some forest,3
+13067031309,2001,Mostly forest / some developed open + low intensity space,2
+13067031309,2019,Mostly developed open + low intensity / some forest,3
+13067031310,2001,Mostly developed space (all intensities) / some forest,4
+13067031310,2019,Mostly developed space (all intensities),7
+13067031311,2001,Mostly forest / some developed open + low intensity space,2
+13067031311,2019,Mostly developed space (all intensities) / some forest,4
+13067031312,2001,Mostly forest / some developed open + low intensity space,2
+13067031312,2019,Mostly developed space (all intensities) / some forest,4
+13067031313,2001,Mostly forest / some developed open + low intensity space,2
+13067031313,2019,Mostly developed space (all intensities) / some forest,4
+13067031404,2001,Mostly developed open + low intensity / some forest,3
+13067031404,2019,Mostly developed open + low intensity / some forest,3
+13067031405,2001,Mostly developed open + low intensity / some forest,3
+13067031405,2019,Mostly developed open + low intensity / some forest,3
+13067031406,2001,Mostly developed open + low intensity / some forest,3
+13067031406,2019,Mostly developed space (all intensities),7
+13067031408,2001,Mostly forest / some developed open + low intensity space,2
+13067031408,2019,Mostly developed space (all intensities) / some forest,4
+13067031409,2001,Mostly forest / some developed open + low intensity space,2
+13067031409,2019,Mostly forest / some developed open + low intensity space,2
+13067031503,2001,Mostly forest / some developed open + low intensity space,2
+13067031503,2019,Mostly forest / some developed open + low intensity space,2
+13067031505,2001,Mostly forest / some developed open + low intensity space,2
+13067031505,2019,Mostly developed open + low intensity / some forest,3
+13067031506,2001,Mostly forest / some developed open + low intensity space,2
+13067031506,2019,Mostly forest / some developed open + low intensity space,2
+13067031507,2001,Mostly forest / some developed open + low intensity space,2
+13067031507,2019,Mostly developed open + low intensity / some forest,3
+13067031508,2001,Mostly forest / farmland,1
+13067031508,2019,Mostly forest / some developed open + low intensity space,2
+13067031509,2001,Mostly forest / farmland,1
+13067031509,2019,Mostly forest / some developed open + low intensity space,2
+13089020100,2001,"Mostly developed open + low intensity, little medium/high",5
+13089020100,2019,"Mostly developed open + low intensity, little medium/high",5
+13089020200,2001,"Mostly developed open + low intensity, little medium/high",5
+13089020200,2019,"Mostly developed open + low intensity, little medium/high",5
+13089020300,2001,"Mostly developed open + low intensity, little medium/high",5
+13089020300,2019,"Mostly developed open + low intensity, little medium/high",5
+13089020400,2001,"Mostly developed open + low intensity, some medium/high",6
+13089020400,2019,"Mostly developed open + low intensity, some medium/high",6
+13089020500,2001,"Mostly developed open + low intensity, some medium/high",6
+13089020500,2019,"Mostly developed open + low intensity, some medium/high",6
+13089020600,2001,Mostly developed space (all intensities),7
+13089020600,2019,Mostly medium to high intensity developed space,8
+13089020700,2001,"Mostly developed open + low intensity, some medium/high",6
+13089020700,2019,"Mostly developed open + low intensity, some medium/high",6
+13089020801,2001,"Mostly developed open + low intensity, little medium/high",5
+13089020801,2019,"Mostly developed open + low intensity, some medium/high",6
+13089020802,2001,"Mostly developed open + low intensity, little medium/high",5
+13089020802,2019,"Mostly developed open + low intensity, some medium/high",6
+13089020900,2001,"Mostly developed open + low intensity, some medium/high",6
+13089020900,2019,"Mostly developed open + low intensity, some medium/high",6
+13089021101,2001,"Mostly developed open + low intensity, little medium/high",5
+13089021101,2019,"Mostly developed open + low intensity, little medium/high",5
+13089021102,2001,"Mostly developed open + low intensity, little medium/high",5
+13089021102,2019,Mostly developed space (all intensities),7
+13089021202,2001,Mostly developed open + low intensity / some forest,3
+13089021202,2019,Mostly developed open + low intensity / some forest,3
+13089021204,2001,Mostly medium to high intensity developed space,8
+13089021204,2019,Mostly medium to high intensity developed space,8
+13089021208,2001,Mostly developed space (all intensities),7
+13089021208,2019,Mostly developed space (all intensities),7
+13089021209,2001,"Mostly developed open + low intensity, little medium/high",5
+13089021209,2019,"Mostly developed open + low intensity, little medium/high",5
+13089021210,2001,"Mostly developed open + low intensity, little medium/high",5
+13089021210,2019,"Mostly developed open + low intensity, some medium/high",6
+13089021211,2001,Mostly developed open + low intensity / some forest,3
+13089021211,2019,Mostly developed open + low intensity / some forest,3
+13089021213,2001,"Mostly developed open + low intensity, little medium/high",5
+13089021213,2019,"Mostly developed open + low intensity, little medium/high",5
+13089021214,2001,"Mostly developed open + low intensity, little medium/high",5
+13089021214,2019,"Mostly developed open + low intensity, little medium/high",5
+13089021215,2001,Mostly medium to high intensity developed space,8
+13089021215,2019,Mostly medium to high intensity developed space,8
+13089021216,2001,Mostly developed space (all intensities),7
+13089021216,2019,Mostly developed space (all intensities),7
+13089021217,2001,"Mostly developed open + low intensity, little medium/high",5
+13089021217,2019,"Mostly developed open + low intensity, little medium/high",5
+13089021218,2001,Mostly developed space (all intensities),7
+13089021218,2019,Mostly developed space (all intensities),7
+13089021301,2001,Mostly medium to high intensity developed space,8
+13089021301,2019,Mostly medium to high intensity developed space,8
+13089021303,2001,Mostly medium to high intensity developed space,8
+13089021303,2019,Mostly medium to high intensity developed space,8
+13089021305,2001,Mostly developed space (all intensities),7
+13089021305,2019,Mostly developed space (all intensities),7
+13089021306,2001,Mostly developed space (all intensities),7
+13089021306,2019,Mostly developed space (all intensities),7
+13089021307,2001,Mostly developed space (all intensities),7
+13089021307,2019,Mostly developed space (all intensities),7
+13089021308,2001,"Mostly developed open + low intensity, some medium/high",6
+13089021308,2019,"Mostly developed open + low intensity, some medium/high",6
+13089021405,2001,"Mostly developed open + low intensity, some medium/high",6
+13089021405,2019,"Mostly developed open + low intensity, some medium/high",6
+13089021409,2001,Mostly developed space (all intensities),7
+13089021409,2019,Mostly developed space (all intensities),7
+13089021410,2001,Mostly developed space (all intensities),7
+13089021410,2019,Mostly developed space (all intensities),7
+13089021411,2001,"Mostly developed open + low intensity, little medium/high",5
+13089021411,2019,Mostly developed space (all intensities),7
+13089021412,2001,"Mostly developed open + low intensity, little medium/high",5
+13089021412,2019,"Mostly developed open + low intensity, little medium/high",5
+13089021413,2001,"Mostly developed open + low intensity, some medium/high",6
+13089021413,2019,"Mostly developed open + low intensity, some medium/high",6
+13089021414,2001,Mostly developed space (all intensities),7
+13089021414,2019,Mostly developed space (all intensities),7
+13089021415,2001,Mostly developed space (all intensities),7
+13089021415,2019,Mostly developed space (all intensities),7
+13089021416,2001,"Mostly developed open + low intensity, some medium/high",6
+13089021416,2019,"Mostly developed open + low intensity, some medium/high",6
+13089021417,2001,Mostly developed space (all intensities),7
+13089021417,2019,Mostly developed space (all intensities),7
+13089021502,2001,"Mostly developed open + low intensity, some medium/high",6
+13089021502,2019,Mostly developed space (all intensities),7
+13089021503,2001,"Mostly developed open + low intensity, little medium/high",5
+13089021503,2019,"Mostly developed open + low intensity, some medium/high",6
+13089021504,2001,Mostly developed open + low intensity / some forest,3
+13089021504,2019,Mostly developed open + low intensity / some forest,3
+13089021602,2001,"Mostly developed open + low intensity, little medium/high",5
+13089021602,2019,"Mostly developed open + low intensity, little medium/high",5
+13089021603,2001,Mostly developed space (all intensities),7
+13089021603,2019,Mostly developed space (all intensities),7
+13089021604,2001,"Mostly developed open + low intensity, little medium/high",5
+13089021604,2019,"Mostly developed open + low intensity, little medium/high",5
+13089021605,2001,"Mostly developed open + low intensity, little medium/high",5
+13089021605,2019,"Mostly developed open + low intensity, little medium/high",5
+13089021703,2001,"Mostly developed open + low intensity, little medium/high",5
+13089021703,2019,"Mostly developed open + low intensity, little medium/high",5
+13089021704,2001,Mostly developed space (all intensities),7
+13089021704,2019,Mostly developed space (all intensities),7
+13089021705,2001,Mostly developed space (all intensities),7
+13089021705,2019,Mostly developed space (all intensities),7
+13089021706,2001,Mostly developed open + low intensity / some forest,3
+13089021706,2019,Mostly developed open + low intensity / some forest,3
+13089021805,2001,Mostly developed open + low intensity / some forest,3
+13089021805,2019,Mostly developed open + low intensity / some forest,3
+13089021806,2001,Mostly developed space (all intensities) / some forest,4
+13089021806,2019,Mostly developed space (all intensities),7
+13089021808,2001,"Mostly developed open + low intensity, little medium/high",5
+13089021808,2019,"Mostly developed open + low intensity, little medium/high",5
+13089021809,2001,Mostly developed open + low intensity / some forest,3
+13089021809,2019,Mostly developed open + low intensity / some forest,3
+13089021810,2001,Mostly developed space (all intensities),7
+13089021810,2019,Mostly developed space (all intensities),7
+13089021812,2001,"Mostly developed open + low intensity, little medium/high",5
+13089021812,2019,"Mostly developed open + low intensity, little medium/high",5
+13089021813,2001,Mostly medium to high intensity developed space,8
+13089021813,2019,Mostly medium to high intensity developed space,8
+13089021814,2001,Mostly developed space (all intensities),7
+13089021814,2019,Mostly developed space (all intensities),7
+13089021906,2001,"Mostly developed open + low intensity, little medium/high",5
+13089021906,2019,"Mostly developed open + low intensity, little medium/high",5
+13089021907,2001,Mostly forest / some developed open + low intensity space,2
+13089021907,2019,Mostly forest / some developed open + low intensity space,2
+13089021908,2001,Mostly developed space (all intensities) / some forest,4
+13089021908,2019,Mostly developed space (all intensities) / some forest,4
+13089021909,2001,"Mostly developed open + low intensity, little medium/high",5
+13089021909,2019,"Mostly developed open + low intensity, some medium/high",6
+13089021910,2001,Mostly developed space (all intensities),7
+13089021910,2019,Mostly developed space (all intensities),7
+13089021911,2001,Mostly medium to high intensity developed space,8
+13089021911,2019,Mostly medium to high intensity developed space,8
+13089021912,2001,Mostly forest / farmland,1
+13089021912,2019,Mostly forest / some developed open + low intensity space,2
+13089021913,2001,Mostly developed space (all intensities),7
+13089021913,2019,Mostly developed space (all intensities),7
+13089022001,2001,"Mostly developed open + low intensity, little medium/high",5
+13089022001,2019,"Mostly developed open + low intensity, little medium/high",5
+13089022004,2001,Mostly developed open + low intensity / some forest,3
+13089022004,2019,Mostly developed open + low intensity / some forest,3
+13089022005,2001,Mostly developed open + low intensity / some forest,3
+13089022005,2019,Mostly developed space (all intensities),7
+13089022007,2001,"Mostly developed open + low intensity, some medium/high",6
+13089022007,2019,"Mostly developed open + low intensity, some medium/high",6
+13089022008,2001,Mostly developed open + low intensity / some forest,3
+13089022008,2019,Mostly developed open + low intensity / some forest,3
+13089022009,2001,Mostly developed space (all intensities) / some forest,4
+13089022009,2019,Mostly developed space (all intensities) / some forest,4
+13089022010,2001,"Mostly developed open + low intensity, little medium/high",5
+13089022010,2019,"Mostly developed open + low intensity, some medium/high",6
+13089022100,2001,"Mostly developed open + low intensity, little medium/high",5
+13089022100,2019,Mostly developed space (all intensities),7
+13089022203,2001,Mostly developed space (all intensities),7
+13089022203,2019,Mostly medium to high intensity developed space,8
+13089022204,2001,"Mostly developed open + low intensity, some medium/high",6
+13089022204,2019,"Mostly developed open + low intensity, some medium/high",6
+13089022301,2001,"Mostly developed open + low intensity, little medium/high",5
+13089022301,2019,"Mostly developed open + low intensity, some medium/high",6
+13089022302,2001,"Mostly developed open + low intensity, little medium/high",5
+13089022302,2019,"Mostly developed open + low intensity, little medium/high",5
+13089022401,2001,"Mostly developed open + low intensity, little medium/high",5
+13089022401,2019,Mostly developed open + low intensity / some forest,3
+13089022402,2001,Mostly developed space (all intensities) / some forest,4
+13089022402,2019,Mostly developed space (all intensities) / some forest,4
+13089022403,2001,"Mostly developed open + low intensity, little medium/high",5
+13089022403,2019,"Mostly developed open + low intensity, little medium/high",5
+13089022500,2001,"Mostly developed open + low intensity, some medium/high",6
+13089022500,2019,"Mostly developed open + low intensity, some medium/high",6
+13089022600,2001,"Mostly developed open + low intensity, little medium/high",5
+13089022600,2019,Mostly developed space (all intensities),7
+13089022700,2001,"Mostly developed open + low intensity, some medium/high",6
+13089022700,2019,"Mostly developed open + low intensity, some medium/high",6
+13089022800,2001,"Mostly developed open + low intensity, little medium/high",5
+13089022800,2019,"Mostly developed open + low intensity, little medium/high",5
+13089022900,2001,"Mostly developed open + low intensity, little medium/high",5
+13089022900,2019,"Mostly developed open + low intensity, little medium/high",5
+13089023000,2001,"Mostly developed open + low intensity, little medium/high",5
+13089023000,2019,"Mostly developed open + low intensity, little medium/high",5
+13089023101,2001,"Mostly developed open + low intensity, little medium/high",5
+13089023101,2019,"Mostly developed open + low intensity, little medium/high",5
+13089023102,2001,"Mostly developed open + low intensity, some medium/high",6
+13089023102,2019,"Mostly developed open + low intensity, some medium/high",6
+13089023107,2001,"Mostly developed open + low intensity, little medium/high",5
+13089023107,2019,"Mostly developed open + low intensity, little medium/high",5
+13089023108,2001,"Mostly developed open + low intensity, some medium/high",6
+13089023108,2019,"Mostly developed open + low intensity, some medium/high",6
+13089023111,2001,Mostly developed open + low intensity / some forest,3
+13089023111,2019,Mostly developed open + low intensity / some forest,3
+13089023112,2001,Mostly developed open + low intensity / some forest,3
+13089023112,2019,Mostly developed space (all intensities),7
+13089023113,2001,Mostly developed space (all intensities),7
+13089023113,2019,Mostly developed space (all intensities),7
+13089023114,2001,"Mostly developed open + low intensity, little medium/high",5
+13089023114,2019,Mostly developed open + low intensity / some forest,3
+13089023115,2001,Mostly medium to high intensity developed space,8
+13089023115,2019,Mostly medium to high intensity developed space,8
+13089023204,2001,Mostly forest / some developed open + low intensity space,2
+13089023204,2019,Mostly developed open + low intensity / some forest,3
+13089023206,2001,Mostly forest / some developed open + low intensity space,2
+13089023206,2019,Mostly developed open + low intensity / some forest,3
+13089023208,2001,"Mostly developed open + low intensity, little medium/high",5
+13089023208,2019,"Mostly developed open + low intensity, little medium/high",5
+13089023209,2001,"Mostly developed open + low intensity, little medium/high",5
+13089023209,2019,"Mostly developed open + low intensity, little medium/high",5
+13089023210,2001,"Mostly developed open + low intensity, little medium/high",5
+13089023210,2019,"Mostly developed open + low intensity, little medium/high",5
+13089023211,2001,"Mostly developed open + low intensity, little medium/high",5
+13089023211,2019,"Mostly developed open + low intensity, little medium/high",5
+13089023212,2001,Mostly forest / some developed open + low intensity space,2
+13089023212,2019,Mostly developed open + low intensity / some forest,3
+13089023213,2001,"Mostly developed open + low intensity, little medium/high",5
+13089023213,2019,"Mostly developed open + low intensity, little medium/high",5
+13089023214,2001,Mostly developed space (all intensities) / some forest,4
+13089023214,2019,Mostly developed space (all intensities),7
+13089023303,2001,Mostly forest / some developed open + low intensity space,2
+13089023303,2019,Mostly developed space (all intensities) / some forest,4
+13089023306,2001,Mostly forest / some developed open + low intensity space,2
+13089023306,2019,Mostly forest / some developed open + low intensity space,2
+13089023309,2001,Mostly developed open + low intensity / some forest,3
+13089023309,2019,"Mostly developed open + low intensity, some medium/high",6
+13089023310,2001,Mostly forest / some developed open + low intensity space,2
+13089023310,2019,Mostly developed space (all intensities) / some forest,4
+13089023311,2001,Mostly forest / some developed open + low intensity space,2
+13089023311,2019,Mostly forest / some developed open + low intensity space,2
+13089023312,2001,Mostly developed open + low intensity / some forest,3
+13089023312,2019,"Mostly developed open + low intensity, little medium/high",5
+13089023313,2001,Mostly developed open + low intensity / some forest,3
+13089023313,2019,Mostly developed space (all intensities) / some forest,4
+13089023314,2001,Mostly developed open + low intensity / some forest,3
+13089023314,2019,Mostly developed open + low intensity / some forest,3
+13089023315,2001,Mostly forest / farmland,1
+13089023315,2019,Mostly forest / farmland,1
+13089023316,2001,Mostly developed open + low intensity / some forest,3
+13089023316,2019,Mostly developed open + low intensity / some forest,3
+13089023410,2001,Mostly developed space (all intensities) / some forest,4
+13089023410,2019,Mostly developed space (all intensities),7
+13089023411,2001,"Mostly developed open + low intensity, little medium/high",5
+13089023411,2019,"Mostly developed open + low intensity, little medium/high",5
+13089023412,2001,Mostly developed open + low intensity / some forest,3
+13089023412,2019,Mostly developed open + low intensity / some forest,3
+13089023413,2001,Mostly developed open + low intensity / some forest,3
+13089023413,2019,Mostly developed open + low intensity / some forest,3
+13089023414,2001,Mostly developed open + low intensity / some forest,3
+13089023414,2019,Mostly developed open + low intensity / some forest,3
+13089023416,2001,Mostly forest / some developed open + low intensity space,2
+13089023416,2019,Mostly forest / some developed open + low intensity space,2
+13089023418,2001,Mostly forest / farmland,1
+13089023418,2019,Mostly forest / farmland,1
+13089023419,2001,Mostly forest / farmland,1
+13089023419,2019,Mostly forest / some developed open + low intensity space,2
+13089023421,2001,Mostly forest / some developed open + low intensity space,2
+13089023421,2019,Mostly developed space (all intensities) / some forest,4
+13089023422,2001,Mostly forest / farmland,1
+13089023422,2019,Mostly forest / some developed open + low intensity space,2
+13089023423,2001,Mostly developed space (all intensities) / some forest,4
+13089023423,2019,Mostly developed space (all intensities) / some forest,4
+13089023424,2001,Mostly forest / some developed open + low intensity space,2
+13089023424,2019,Mostly forest / some developed open + low intensity space,2
+13089023425,2001,Mostly developed open + low intensity / some forest,3
+13089023425,2019,Mostly developed open + low intensity / some forest,3
+13089023426,2001,Mostly forest / some developed open + low intensity space,2
+13089023426,2019,Mostly developed open + low intensity / some forest,3
+13089023427,2001,Mostly forest / some developed open + low intensity space,2
+13089023427,2019,Mostly forest / some developed open + low intensity space,2
+13089023428,2001,Mostly forest / some developed open + low intensity space,2
+13089023428,2019,Mostly developed space (all intensities) / some forest,4
+13089023501,2001,"Mostly developed open + low intensity, little medium/high",5
+13089023501,2019,"Mostly developed open + low intensity, little medium/high",5
+13089023504,2001,"Mostly developed open + low intensity, some medium/high",6
+13089023504,2019,"Mostly developed open + low intensity, some medium/high",6
+13089023505,2001,"Mostly developed open + low intensity, little medium/high",5
+13089023505,2019,"Mostly developed open + low intensity, little medium/high",5
+13089023506,2001,Mostly developed open + low intensity / some forest,3
+13089023506,2019,Mostly developed open + low intensity / some forest,3
+13089023507,2001,"Mostly developed open + low intensity, little medium/high",5
+13089023507,2019,"Mostly developed open + low intensity, little medium/high",5
+13089023601,2001,"Mostly developed open + low intensity, little medium/high",5
+13089023601,2019,"Mostly developed open + low intensity, little medium/high",5
+13089023602,2001,Mostly developed open + low intensity / some forest,3
+13089023602,2019,Mostly developed open + low intensity / some forest,3
+13089023603,2001,Mostly developed open + low intensity / some forest,3
+13089023603,2019,Mostly developed open + low intensity / some forest,3
+13089023700,2001,Mostly forest / some developed open + low intensity space,2
+13089023700,2019,Mostly developed open + low intensity / some forest,3
+13089023801,2001,Mostly forest / some developed open + low intensity space,2
+13089023801,2019,Mostly developed open + low intensity / some forest,3
+13089023802,2001,Mostly developed space (all intensities) / some forest,4
+13089023802,2019,Mostly developed space (all intensities) / some forest,4
+13089023803,2001,"Mostly developed open + low intensity, little medium/high",5
+13089023803,2019,"Mostly developed open + low intensity, little medium/high",5
+13089980000,2001,"Mostly developed open + low intensity, little medium/high",5
+13089980000,2019,"Mostly developed open + low intensity, little medium/high",5
+13097080102,2001,Mostly forest / farmland,1
+13097080102,2019,Mostly developed space (all intensities) / some forest,4
+13097080103,2001,Mostly developed space (all intensities) / some forest,4
+13097080103,2019,Mostly developed space (all intensities) / some forest,4
+13097080201,2001,Mostly forest / farmland,1
+13097080201,2019,Mostly forest / farmland,1
+13097080202,2001,Mostly forest / some developed open + low intensity space,2
+13097080202,2019,Mostly forest / some developed open + low intensity space,2
+13097080301,2001,Mostly forest / farmland,1
+13097080301,2019,Mostly forest / some developed open + low intensity space,2
+13097080303,2001,Mostly developed open + low intensity / some forest,3
+13097080303,2019,Mostly developed open + low intensity / some forest,3
+13097080304,2001,Mostly developed space (all intensities) / some forest,4
+13097080304,2019,Mostly developed space (all intensities) / some forest,4
+13097080402,2001,Mostly forest / farmland,1
+13097080402,2019,Mostly forest / farmland,1
+13097080403,2001,Mostly forest / farmland,1
+13097080403,2019,Mostly forest / farmland,1
+13097080404,2001,Mostly forest / farmland,1
+13097080404,2019,Mostly forest / farmland,1
+13097080505,2001,Mostly forest / some developed open + low intensity space,2
+13097080505,2019,Mostly forest / some developed open + low intensity space,2
+13097080506,2001,Mostly forest / farmland,1
+13097080506,2019,Mostly forest / farmland,1
+13097080507,2001,Mostly forest / farmland,1
+13097080507,2019,Mostly forest / farmland,1
+13097080508,2001,Mostly developed open + low intensity / some forest,3
+13097080508,2019,Mostly developed open + low intensity / some forest,3
+13097080509,2001,Mostly forest / some developed open + low intensity space,2
+13097080509,2019,Mostly developed open + low intensity / some forest,3
+13097080510,2001,Mostly forest / farmland,1
+13097080510,2019,Mostly forest / some developed open + low intensity space,2
+13097080511,2001,Mostly forest / farmland,1
+13097080511,2019,Mostly forest / farmland,1
+13097080602,2001,Mostly forest / farmland,1
+13097080602,2019,Mostly forest / farmland,1
+13097080603,2001,Mostly forest / farmland,1
+13097080603,2019,Mostly forest / some developed open + low intensity space,2
+13097080604,2001,Mostly forest / farmland,1
+13097080604,2019,Mostly forest / farmland,1
+13113140101,2001,Mostly forest / farmland,1
+13113140101,2019,Mostly forest / farmland,1
+13113140102,2001,Mostly forest / farmland,1
+13113140102,2019,Mostly forest / farmland,1
+13113140203,2001,Mostly forest / farmland,1
+13113140203,2019,Mostly forest / farmland,1
+13113140204,2001,Mostly forest / farmland,1
+13113140204,2019,Mostly forest / farmland,1
+13113140206,2001,Mostly forest / farmland,1
+13113140206,2019,Mostly forest / some developed open + low intensity space,2
+13113140207,2001,Mostly developed open + low intensity / some forest,3
+13113140207,2019,Mostly developed open + low intensity / some forest,3
+13113140208,2001,Mostly forest / farmland,1
+13113140208,2019,Mostly developed space (all intensities) / some forest,4
+13113140303,2001,Mostly developed space (all intensities) / some forest,4
+13113140303,2019,Mostly developed space (all intensities) / some forest,4
+13113140304,2001,Mostly forest / farmland,1
+13113140304,2019,Mostly forest / farmland,1
+13113140305,2001,Mostly forest / farmland,1
+13113140305,2019,Mostly forest / farmland,1
+13113140306,2001,Mostly forest / some developed open + low intensity space,2
+13113140306,2019,Mostly developed space (all intensities),7
+13113140307,2001,Mostly forest / some developed open + low intensity space,2
+13113140307,2019,Mostly forest / some developed open + low intensity space,2
+13113140403,2001,Mostly forest / some developed open + low intensity space,2
+13113140403,2019,Mostly forest / some developed open + low intensity space,2
+13113140404,2001,Mostly forest / some developed open + low intensity space,2
+13113140404,2019,Mostly developed space (all intensities) / some forest,4
+13113140405,2001,Mostly forest / farmland,1
+13113140405,2019,Mostly forest / farmland,1
+13113140406,2001,Mostly forest / farmland,1
+13113140406,2019,Mostly forest / some developed open + low intensity space,2
+13113140407,2001,Mostly forest / farmland,1
+13113140407,2019,Mostly forest / farmland,1
+13113140408,2001,Mostly forest / farmland,1
+13113140408,2019,Mostly forest / farmland,1
+13113140501,2001,Mostly forest / farmland,1
+13113140501,2019,Mostly forest / farmland,1
+13113140502,2001,Mostly forest / farmland,1
+13113140502,2019,Mostly forest / farmland,1
+13117130101,2001,Mostly forest / farmland,1
+13117130101,2019,Mostly forest / farmland,1
+13117130102,2001,Mostly forest / farmland,1
+13117130102,2019,Mostly forest / farmland,1
+13117130103,2001,Mostly forest / farmland,1
+13117130103,2019,Mostly forest / farmland,1
+13117130104,2001,Mostly forest / farmland,1
+13117130104,2019,Mostly forest / farmland,1
+13117130105,2001,Mostly forest / farmland,1
+13117130105,2019,Mostly forest / farmland,1
+13117130201,2001,Mostly forest / farmland,1
+13117130201,2019,Mostly forest / farmland,1
+13117130202,2001,Mostly forest / farmland,1
+13117130202,2019,Mostly forest / farmland,1
+13117130203,2001,Mostly forest / farmland,1
+13117130203,2019,Mostly forest / farmland,1
+13117130204,2001,Mostly forest / farmland,1
+13117130204,2019,Mostly forest / farmland,1
+13117130205,2001,Mostly forest / farmland,1
+13117130205,2019,Mostly forest / farmland,1
+13117130301,2001,Mostly forest / farmland,1
+13117130301,2019,Mostly forest / farmland,1
+13117130302,2001,Mostly forest / farmland,1
+13117130302,2019,Mostly forest / some developed open + low intensity space,2
+13117130303,2001,Mostly forest / farmland,1
+13117130303,2019,Mostly forest / farmland,1
+13117130304,2001,Mostly forest / farmland,1
+13117130304,2019,Mostly forest / some developed open + low intensity space,2
+13117130305,2001,Mostly forest / farmland,1
+13117130305,2019,Mostly forest / some developed open + low intensity space,2
+13117130306,2001,Mostly forest / some developed open + low intensity space,2
+13117130306,2019,Mostly developed open + low intensity / some forest,3
+13117130307,2001,Mostly forest / farmland,1
+13117130307,2019,Mostly forest / some developed open + low intensity space,2
+13117130403,2001,Mostly forest / farmland,1
+13117130403,2019,Mostly forest / farmland,1
+13117130404,2001,Mostly forest / farmland,1
+13117130404,2019,Mostly forest / some developed open + low intensity space,2
+13117130405,2001,Mostly forest / farmland,1
+13117130405,2019,Mostly forest / some developed open + low intensity space,2
+13117130406,2001,Mostly forest / farmland,1
+13117130406,2019,Mostly developed space (all intensities),7
+13117130408,2001,Mostly forest / farmland,1
+13117130408,2019,Mostly forest / some developed open + low intensity space,2
+13117130409,2001,Mostly forest / some developed open + low intensity space,2
+13117130409,2019,Mostly forest / some developed open + low intensity space,2
+13117130410,2001,Mostly forest / some developed open + low intensity space,2
+13117130410,2019,Mostly developed space (all intensities) / some forest,4
+13117130503,2001,Mostly forest / farmland,1
+13117130503,2019,Mostly forest / farmland,1
+13117130504,2001,Mostly forest / farmland,1
+13117130504,2019,Mostly forest / farmland,1
+13117130505,2001,Mostly forest / farmland,1
+13117130505,2019,Mostly forest / farmland,1
+13117130506,2001,Mostly forest / farmland,1
+13117130506,2019,Mostly forest / some developed open + low intensity space,2
+13117130507,2001,Mostly forest / some developed open + low intensity space,2
+13117130507,2019,Mostly developed space (all intensities) / some forest,4
+13117130508,2001,Mostly forest / some developed open + low intensity space,2
+13117130508,2019,Mostly forest / some developed open + low intensity space,2
+13117130509,2001,Mostly forest / some developed open + low intensity space,2
+13117130509,2019,Mostly forest / some developed open + low intensity space,2
+13117130510,2001,Mostly forest / farmland,1
+13117130510,2019,Mostly forest / some developed open + low intensity space,2
+13117130601,2001,Mostly forest / farmland,1
+13117130601,2019,Mostly developed space (all intensities) / some forest,4
+13117130602,2001,Mostly forest / some developed open + low intensity space,2
+13117130602,2019,Mostly developed space (all intensities),7
+13117130603,2001,Mostly developed space (all intensities) / some forest,4
+13117130603,2019,Mostly developed space (all intensities) / some forest,4
+13117130604,2001,Mostly forest / some developed open + low intensity space,2
+13117130604,2019,Mostly developed space (all intensities),7
+13117130605,2001,Mostly forest / farmland,1
+13117130605,2019,Mostly forest / some developed open + low intensity space,2
+13117130606,2001,Mostly developed open + low intensity / some forest,3
+13117130606,2019,Mostly developed space (all intensities),7
+13117130607,2001,Mostly forest / farmland,1
+13117130607,2019,Mostly developed open + low intensity / some forest,3
+13117130608,2001,Mostly developed space (all intensities) / some forest,4
+13117130608,2019,Mostly developed space (all intensities),7
+13117130609,2001,Mostly forest / farmland,1
+13117130609,2019,Mostly developed open + low intensity / some forest,3
+13117130610,2001,Mostly forest / farmland,1
+13117130610,2019,Mostly forest / some developed open + low intensity space,2
+13117130611,2001,Mostly forest / farmland,1
+13117130611,2019,Mostly forest / some developed open + low intensity space,2
+13117130612,2001,Mostly forest / some developed open + low intensity space,2
+13117130612,2019,Mostly developed open + low intensity / some forest,3
+13117130613,2001,Mostly forest / farmland,1
+13117130613,2019,Mostly developed space (all intensities) / some forest,4
+13121000100,2001,"Mostly developed open + low intensity, little medium/high",5
+13121000100,2019,"Mostly developed open + low intensity, little medium/high",5
+13121000200,2001,"Mostly developed open + low intensity, some medium/high",6
+13121000200,2019,"Mostly developed open + low intensity, some medium/high",6
+13121000400,2001,Mostly developed space (all intensities),7
+13121000400,2019,Mostly developed space (all intensities),7
+13121000500,2001,"Mostly developed open + low intensity, some medium/high",6
+13121000500,2019,Mostly developed space (all intensities),7
+13121000600,2001,Mostly medium to high intensity developed space,8
+13121000600,2019,Mostly medium to high intensity developed space,8
+13121000700,2001,Mostly medium to high intensity developed space,8
+13121000700,2019,Mostly medium to high intensity developed space,8
+13121001001,2001,Mostly medium to high intensity developed space,8
+13121001001,2019,Mostly medium to high intensity developed space,8
+13121001002,2001,Mostly medium to high intensity developed space,8
+13121001002,2019,Mostly medium to high intensity developed space,8
+13121001100,2001,Mostly medium to high intensity developed space,8
+13121001100,2019,Mostly medium to high intensity developed space,8
+13121001201,2001,Mostly medium to high intensity developed space,8
+13121001201,2019,Mostly medium to high intensity developed space,8
+13121001202,2001,Mostly medium to high intensity developed space,8
+13121001202,2019,Mostly medium to high intensity developed space,8
+13121001300,2001,Mostly medium to high intensity developed space,8
+13121001300,2019,Mostly medium to high intensity developed space,8
+13121001400,2001,Mostly developed space (all intensities),7
+13121001400,2019,Mostly medium to high intensity developed space,8
+13121001500,2001,Mostly developed space (all intensities),7
+13121001500,2019,Mostly developed space (all intensities),7
+13121001600,2001,"Mostly developed open + low intensity, some medium/high",6
+13121001600,2019,Mostly developed space (all intensities),7
+13121001700,2001,Mostly medium to high intensity developed space,8
+13121001700,2019,Mostly medium to high intensity developed space,8
+13121001800,2001,Mostly medium to high intensity developed space,8
+13121001800,2019,Mostly medium to high intensity developed space,8
+13121001900,2001,Mostly medium to high intensity developed space,8
+13121001900,2019,Mostly medium to high intensity developed space,8
+13121002100,2001,Mostly medium to high intensity developed space,8
+13121002100,2019,Mostly medium to high intensity developed space,8
+13121002300,2001,Mostly developed space (all intensities),7
+13121002300,2019,Mostly developed space (all intensities),7
+13121002400,2001,"Mostly developed open + low intensity, some medium/high",6
+13121002400,2019,"Mostly developed open + low intensity, some medium/high",6
+13121002500,2001,Mostly medium to high intensity developed space,8
+13121002500,2019,Mostly medium to high intensity developed space,8
+13121002600,2001,Mostly medium to high intensity developed space,8
+13121002600,2019,Mostly medium to high intensity developed space,8
+13121002800,2001,Mostly medium to high intensity developed space,8
+13121002800,2019,Mostly medium to high intensity developed space,8
+13121002900,2001,Mostly medium to high intensity developed space,8
+13121002900,2019,Mostly medium to high intensity developed space,8
+13121003000,2001,"Mostly developed open + low intensity, some medium/high",6
+13121003000,2019,Mostly developed space (all intensities),7
+13121003100,2001,Mostly developed space (all intensities),7
+13121003100,2019,Mostly medium to high intensity developed space,8
+13121003200,2001,Mostly medium to high intensity developed space,8
+13121003200,2019,Mostly medium to high intensity developed space,8
+13121003500,2001,Mostly medium to high intensity developed space,8
+13121003500,2019,Mostly medium to high intensity developed space,8
+13121003600,2001,Mostly medium to high intensity developed space,8
+13121003600,2019,Mostly medium to high intensity developed space,8
+13121003700,2001,Mostly medium to high intensity developed space,8
+13121003700,2019,Mostly medium to high intensity developed space,8
+13121003800,2001,Mostly medium to high intensity developed space,8
+13121003800,2019,Mostly medium to high intensity developed space,8
+13121003900,2001,"Mostly developed open + low intensity, some medium/high",6
+13121003900,2019,"Mostly developed open + low intensity, some medium/high",6
+13121004000,2001,"Mostly developed open + low intensity, some medium/high",6
+13121004000,2019,"Mostly developed open + low intensity, some medium/high",6
+13121004100,2001,"Mostly developed open + low intensity, some medium/high",6
+13121004100,2019,"Mostly developed open + low intensity, some medium/high",6
+13121004200,2001,Mostly medium to high intensity developed space,8
+13121004200,2019,Mostly medium to high intensity developed space,8
+13121004300,2001,Mostly medium to high intensity developed space,8
+13121004300,2019,Mostly medium to high intensity developed space,8
+13121004400,2001,Mostly medium to high intensity developed space,8
+13121004400,2019,Mostly medium to high intensity developed space,8
+13121004800,2001,Mostly medium to high intensity developed space,8
+13121004800,2019,Mostly medium to high intensity developed space,8
+13121004900,2001,Mostly medium to high intensity developed space,8
+13121004900,2019,Mostly medium to high intensity developed space,8
+13121005000,2001,Mostly medium to high intensity developed space,8
+13121005000,2019,Mostly medium to high intensity developed space,8
+13121005200,2001,"Mostly developed open + low intensity, some medium/high",6
+13121005200,2019,"Mostly developed open + low intensity, some medium/high",6
+13121005300,2001,"Mostly developed open + low intensity, some medium/high",6
+13121005300,2019,"Mostly developed open + low intensity, some medium/high",6
+13121005501,2001,Mostly developed space (all intensities),7
+13121005501,2019,Mostly developed space (all intensities),7
+13121005502,2001,Mostly developed space (all intensities),7
+13121005502,2019,Mostly medium to high intensity developed space,8
+13121005700,2001,Mostly medium to high intensity developed space,8
+13121005700,2019,Mostly medium to high intensity developed space,8
+13121005800,2001,Mostly medium to high intensity developed space,8
+13121005800,2019,Mostly medium to high intensity developed space,8
+13121006000,2001,"Mostly developed open + low intensity, some medium/high",6
+13121006000,2019,"Mostly developed open + low intensity, some medium/high",6
+13121006100,2001,"Mostly developed open + low intensity, little medium/high",5
+13121006100,2019,"Mostly developed open + low intensity, little medium/high",5
+13121006200,2001,"Mostly developed open + low intensity, some medium/high",6
+13121006200,2019,"Mostly developed open + low intensity, some medium/high",6
+13121006300,2001,Mostly medium to high intensity developed space,8
+13121006300,2019,Mostly medium to high intensity developed space,8
+13121006400,2001,Mostly developed space (all intensities),7
+13121006400,2019,Mostly developed space (all intensities),7
+13121006500,2001,"Mostly developed open + low intensity, some medium/high",6
+13121006500,2019,Mostly developed space (all intensities),7
+13121006601,2001,Mostly developed space (all intensities),7
+13121006601,2019,Mostly medium to high intensity developed space,8
+13121006602,2001,"Mostly developed open + low intensity, some medium/high",6
+13121006602,2019,"Mostly developed open + low intensity, some medium/high",6
+13121006700,2001,"Mostly developed open + low intensity, some medium/high",6
+13121006700,2019,Mostly developed space (all intensities),7
+13121006801,2001,"Mostly developed open + low intensity, some medium/high",6
+13121006801,2019,Mostly developed space (all intensities),7
+13121006802,2001,Mostly developed space (all intensities) / some forest,4
+13121006802,2019,Mostly developed open + low intensity / some forest,3
+13121006900,2001,Mostly developed open + low intensity / some forest,3
+13121006900,2019,Mostly developed open + low intensity / some forest,3
+13121007001,2001,Mostly forest / some developed open + low intensity space,2
+13121007001,2019,Mostly forest / some developed open + low intensity space,2
+13121007002,2001,Mostly developed space (all intensities),7
+13121007002,2019,Mostly developed space (all intensities),7
+13121007100,2001,Mostly developed space (all intensities),7
+13121007100,2019,Mostly developed space (all intensities),7
+13121007200,2001,Mostly forest / farmland,1
+13121007200,2019,Mostly developed space (all intensities) / some forest,4
+13121007300,2001,Mostly forest / some developed open + low intensity space,2
+13121007300,2019,Mostly developed space (all intensities) / some forest,4
+13121007400,2001,Mostly developed space (all intensities),7
+13121007400,2019,Mostly developed space (all intensities),7
+13121007500,2001,Mostly developed space (all intensities),7
+13121007500,2019,Mostly developed space (all intensities),7
+13121007602,2001,Mostly forest / some developed open + low intensity space,2
+13121007602,2019,Mostly forest / some developed open + low intensity space,2
+13121007603,2001,"Mostly developed open + low intensity, some medium/high",6
+13121007603,2019,"Mostly developed open + low intensity, some medium/high",6
+13121007604,2001,Mostly forest / some developed open + low intensity space,2
+13121007604,2019,Mostly developed space (all intensities) / some forest,4
+13121007703,2001,Mostly forest / some developed open + low intensity space,2
+13121007703,2019,Mostly forest / some developed open + low intensity space,2
+13121007704,2001,Mostly forest / some developed open + low intensity space,2
+13121007704,2019,Mostly forest / some developed open + low intensity space,2
+13121007705,2001,Mostly developed space (all intensities) / some forest,4
+13121007705,2019,Mostly developed space (all intensities) / some forest,4
+13121007706,2001,Mostly forest / farmland,1
+13121007706,2019,Mostly forest / some developed open + low intensity space,2
+13121007802,2001,Mostly forest / some developed open + low intensity space,2
+13121007802,2019,Mostly forest / some developed open + low intensity space,2
+13121007805,2001,Mostly developed space (all intensities) / some forest,4
+13121007805,2019,Mostly developed space (all intensities) / some forest,4
+13121007806,2001,Mostly forest / some developed open + low intensity space,2
+13121007806,2019,Mostly forest / some developed open + low intensity space,2
+13121007807,2001,Mostly developed open + low intensity / some forest,3
+13121007807,2019,Mostly developed open + low intensity / some forest,3
+13121007808,2001,Mostly developed open + low intensity / some forest,3
+13121007808,2019,Mostly developed space (all intensities),7
+13121007900,2001,Mostly forest / some developed open + low intensity space,2
+13121007900,2019,Mostly forest / some developed open + low intensity space,2
+13121008000,2001,"Mostly developed open + low intensity, little medium/high",5
+13121008000,2019,"Mostly developed open + low intensity, little medium/high",5
+13121008101,2001,Mostly forest / some developed open + low intensity space,2
+13121008101,2019,Mostly forest / some developed open + low intensity space,2
+13121008102,2001,Mostly forest / some developed open + low intensity space,2
+13121008102,2019,Mostly forest / some developed open + low intensity space,2
+13121008201,2001,Mostly developed open + low intensity / some forest,3
+13121008201,2019,Mostly developed open + low intensity / some forest,3
+13121008202,2001,Mostly developed space (all intensities) / some forest,4
+13121008202,2019,Mostly developed space (all intensities) / some forest,4
+13121008301,2001,"Mostly developed open + low intensity, little medium/high",5
+13121008301,2019,"Mostly developed open + low intensity, little medium/high",5
+13121008302,2001,Mostly developed open + low intensity / some forest,3
+13121008302,2019,Mostly developed open + low intensity / some forest,3
+13121008400,2001,"Mostly developed open + low intensity, some medium/high",6
+13121008400,2019,"Mostly developed open + low intensity, some medium/high",6
+13121008500,2001,Mostly developed open + low intensity / some forest,3
+13121008500,2019,Mostly developed open + low intensity / some forest,3
+13121008601,2001,Mostly developed open + low intensity / some forest,3
+13121008601,2019,Mostly developed open + low intensity / some forest,3
+13121008602,2001,Mostly developed space (all intensities) / some forest,4
+13121008602,2019,Mostly developed space (all intensities) / some forest,4
+13121008700,2001,Mostly developed space (all intensities) / some forest,4
+13121008700,2019,Mostly developed space (all intensities) / some forest,4
+13121008800,2001,Mostly developed space (all intensities),7
+13121008800,2019,Mostly developed space (all intensities),7
+13121008902,2001,Mostly medium to high intensity developed space,8
+13121008902,2019,Mostly medium to high intensity developed space,8
+13121008903,2001,Mostly developed space (all intensities),7
+13121008903,2019,Mostly developed space (all intensities),7
+13121008904,2001,"Mostly developed open + low intensity, little medium/high",5
+13121008904,2019,Mostly developed space (all intensities),7
+13121009000,2001,"Mostly developed open + low intensity, little medium/high",5
+13121009000,2019,"Mostly developed open + low intensity, little medium/high",5
+13121009101,2001,"Mostly developed open + low intensity, some medium/high",6
+13121009101,2019,"Mostly developed open + low intensity, some medium/high",6
+13121009102,2001,Mostly developed space (all intensities),7
+13121009102,2019,Mostly developed space (all intensities),7
+13121009200,2001,Mostly developed space (all intensities),7
+13121009200,2019,Mostly developed space (all intensities),7
+13121009300,2001,"Mostly developed open + low intensity, little medium/high",5
+13121009300,2019,"Mostly developed open + low intensity, some medium/high",6
+13121009402,2001,Mostly medium to high intensity developed space,8
+13121009402,2019,Mostly medium to high intensity developed space,8
+13121009403,2001,Mostly medium to high intensity developed space,8
+13121009403,2019,Mostly medium to high intensity developed space,8
+13121009404,2001,Mostly developed open + low intensity / some forest,3
+13121009404,2019,Mostly developed open + low intensity / some forest,3
+13121009501,2001,Mostly forest / some developed open + low intensity space,2
+13121009501,2019,"Mostly developed open + low intensity, little medium/high",5
+13121009502,2001,Mostly developed space (all intensities),7
+13121009502,2019,Mostly developed space (all intensities),7
+13121009601,2001,Mostly medium to high intensity developed space,8
+13121009601,2019,Mostly medium to high intensity developed space,8
+13121009602,2001,Mostly developed space (all intensities),7
+13121009602,2019,Mostly developed space (all intensities),7
+13121009603,2001,Mostly developed space (all intensities),7
+13121009603,2019,Mostly developed space (all intensities),7
+13121009700,2001,Mostly forest / farmland,1
+13121009700,2019,Mostly forest / some developed open + low intensity space,2
+13121009801,2001,Mostly forest / some developed open + low intensity space,2
+13121009801,2019,Mostly developed open + low intensity / some forest,3
+13121009802,2001,Mostly forest / some developed open + low intensity space,2
+13121009802,2019,Mostly forest / some developed open + low intensity space,2
+13121009900,2001,Mostly forest / some developed open + low intensity space,2
+13121009900,2019,Mostly developed open + low intensity / some forest,3
+13121010001,2001,Mostly developed open + low intensity / some forest,3
+13121010001,2019,Mostly developed open + low intensity / some forest,3
+13121010002,2001,"Mostly developed open + low intensity, little medium/high",5
+13121010002,2019,"Mostly developed open + low intensity, little medium/high",5
+13121010106,2001,Mostly forest / farmland,1
+13121010106,2019,Mostly forest / some developed open + low intensity space,2
+13121010107,2001,Mostly forest / some developed open + low intensity space,2
+13121010107,2019,Mostly forest / some developed open + low intensity space,2
+13121010108,2001,Mostly developed open + low intensity / some forest,3
+13121010108,2019,Mostly developed open + low intensity / some forest,3
+13121010110,2001,Mostly developed space (all intensities),7
+13121010110,2019,Mostly developed space (all intensities),7
+13121010113,2001,Mostly developed space (all intensities),7
+13121010113,2019,Mostly developed space (all intensities),7
+13121010114,2001,Mostly developed open + low intensity / some forest,3
+13121010114,2019,Mostly developed open + low intensity / some forest,3
+13121010115,2001,Mostly developed space (all intensities) / some forest,4
+13121010115,2019,Mostly developed space (all intensities) / some forest,4
+13121010117,2001,Mostly developed space (all intensities),7
+13121010117,2019,Mostly developed space (all intensities),7
+13121010118,2001,Mostly developed space (all intensities),7
+13121010118,2019,"Mostly developed open + low intensity, some medium/high",6
+13121010119,2001,Mostly medium to high intensity developed space,8
+13121010119,2019,Mostly medium to high intensity developed space,8
+13121010120,2001,Mostly developed open + low intensity / some forest,3
+13121010120,2019,Mostly developed open + low intensity / some forest,3
+13121010121,2001,Mostly developed space (all intensities) / some forest,4
+13121010121,2019,Mostly developed space (all intensities),7
+13121010122,2001,Mostly developed space (all intensities),7
+13121010122,2019,Mostly developed space (all intensities),7
+13121010123,2001,Mostly developed open + low intensity / some forest,3
+13121010123,2019,Mostly developed space (all intensities),7
+13121010204,2001,Mostly forest / some developed open + low intensity space,2
+13121010204,2019,Mostly forest / some developed open + low intensity space,2
+13121010205,2001,Mostly developed open + low intensity / some forest,3
+13121010205,2019,Mostly developed open + low intensity / some forest,3
+13121010206,2001,Mostly forest / some developed open + low intensity space,2
+13121010206,2019,Mostly forest / some developed open + low intensity space,2
+13121010208,2001,"Mostly developed open + low intensity, little medium/high",5
+13121010208,2019,"Mostly developed open + low intensity, little medium/high",5
+13121010209,2001,Mostly forest / some developed open + low intensity space,2
+13121010209,2019,Mostly developed space (all intensities) / some forest,4
+13121010210,2001,Mostly forest / some developed open + low intensity space,2
+13121010210,2019,Mostly developed open + low intensity / some forest,3
+13121010211,2001,Mostly forest / some developed open + low intensity space,2
+13121010211,2019,Mostly developed open + low intensity / some forest,3
+13121010212,2001,Mostly forest / some developed open + low intensity space,2
+13121010212,2019,Mostly developed open + low intensity / some forest,3
+13121010301,2001,Mostly forest / farmland,1
+13121010301,2019,Mostly forest / farmland,1
+13121010303,2001,Mostly forest / farmland,1
+13121010303,2019,Mostly developed space (all intensities) / some forest,4
+13121010304,2001,Mostly forest / farmland,1
+13121010304,2019,Mostly forest / some developed open + low intensity space,2
+13121010400,2001,Mostly forest / farmland,1
+13121010400,2019,Mostly forest / farmland,1
+13121010507,2001,Mostly developed space (all intensities) / some forest,4
+13121010507,2019,Mostly developed space (all intensities),7
+13121010508,2001,Mostly forest / some developed open + low intensity space,2
+13121010508,2019,Mostly developed open + low intensity / some forest,3
+13121010510,2001,Mostly forest / farmland,1
+13121010510,2019,Mostly developed space (all intensities) / some forest,4
+13121010511,2001,Mostly forest / farmland,1
+13121010511,2019,Mostly developed space (all intensities) / some forest,4
+13121010512,2001,Mostly forest / some developed open + low intensity space,2
+13121010512,2019,Mostly developed space (all intensities) / some forest,4
+13121010513,2001,Mostly forest / farmland,1
+13121010513,2019,Mostly forest / some developed open + low intensity space,2
+13121010514,2001,Mostly forest / farmland,1
+13121010514,2019,Mostly forest / some developed open + low intensity space,2
+13121010515,2001,Mostly forest / farmland,1
+13121010515,2019,Mostly forest / some developed open + low intensity space,2
+13121010516,2001,Mostly forest / some developed open + low intensity space,2
+13121010516,2019,Mostly developed open + low intensity / some forest,3
+13121010601,2001,"Mostly developed open + low intensity, little medium/high",5
+13121010601,2019,"Mostly developed open + low intensity, little medium/high",5
+13121010603,2001,Mostly developed space (all intensities) / some forest,4
+13121010603,2019,Mostly developed space (all intensities) / some forest,4
+13121010604,2001,Mostly developed space (all intensities) / some forest,4
+13121010604,2019,Mostly developed space (all intensities),7
+13121010800,2001,Mostly developed space (all intensities),7
+13121010800,2019,Mostly developed space (all intensities),7
+13121011000,2001,Mostly developed space (all intensities),7
+13121011000,2019,Mostly developed space (all intensities),7
+13121011100,2001,Mostly medium to high intensity developed space,8
+13121011100,2019,Mostly medium to high intensity developed space,8
+13121011201,2001,"Mostly developed open + low intensity, some medium/high",6
+13121011201,2019,Mostly developed space (all intensities),7
+13121011202,2001,"Mostly developed open + low intensity, some medium/high",6
+13121011202,2019,"Mostly developed open + low intensity, some medium/high",6
+13121011301,2001,"Mostly developed open + low intensity, little medium/high",5
+13121011301,2019,"Mostly developed open + low intensity, little medium/high",5
+13121011303,2001,Mostly forest / some developed open + low intensity space,2
+13121011303,2019,Mostly developed open + low intensity / some forest,3
+13121011305,2001,Mostly developed space (all intensities) / some forest,4
+13121011305,2019,Mostly developed space (all intensities),7
+13121011306,2001,Mostly forest / farmland,1
+13121011306,2019,Mostly developed space (all intensities) / some forest,4
+13121011405,2001,Mostly forest / some developed open + low intensity space,2
+13121011405,2019,Mostly forest / some developed open + low intensity space,2
+13121011410,2001,Mostly developed open + low intensity / some forest,3
+13121011410,2019,Mostly developed open + low intensity / some forest,3
+13121011411,2001,Mostly developed open + low intensity / some forest,3
+13121011411,2019,Mostly developed open + low intensity / some forest,3
+13121011412,2001,Mostly developed open + low intensity / some forest,3
+13121011412,2019,Mostly developed open + low intensity / some forest,3
+13121011414,2001,Mostly developed open + low intensity / some forest,3
+13121011414,2019,"Mostly developed open + low intensity, some medium/high",6
+13121011416,2001,Mostly developed open + low intensity / some forest,3
+13121011416,2019,Mostly developed open + low intensity / some forest,3
+13121011417,2001,Mostly forest / some developed open + low intensity space,2
+13121011417,2019,Mostly developed open + low intensity / some forest,3
+13121011418,2001,Mostly forest / some developed open + low intensity space,2
+13121011418,2019,Mostly forest / some developed open + low intensity space,2
+13121011419,2001,Mostly developed open + low intensity / some forest,3
+13121011419,2019,Mostly developed open + low intensity / some forest,3
+13121011420,2001,Mostly developed space (all intensities) / some forest,4
+13121011420,2019,Mostly developed space (all intensities) / some forest,4
+13121011421,2001,Mostly medium to high intensity developed space,8
+13121011421,2019,Mostly medium to high intensity developed space,8
+13121011422,2001,Mostly developed open + low intensity / some forest,3
+13121011422,2019,Mostly developed open + low intensity / some forest,3
+13121011423,2001,Mostly forest / some developed open + low intensity space,2
+13121011423,2019,Mostly forest / some developed open + low intensity space,2
+13121011424,2001,"Mostly developed open + low intensity, little medium/high",5
+13121011424,2019,"Mostly developed open + low intensity, little medium/high",5
+13121011425,2001,Mostly developed open + low intensity / some forest,3
+13121011425,2019,Mostly developed open + low intensity / some forest,3
+13121011426,2001,"Mostly developed open + low intensity, some medium/high",6
+13121011426,2019,"Mostly developed open + low intensity, some medium/high",6
+13121011427,2001,"Mostly developed open + low intensity, little medium/high",5
+13121011427,2019,"Mostly developed open + low intensity, little medium/high",5
+13121011503,2001,Mostly forest / farmland,1
+13121011503,2019,Mostly forest / some developed open + low intensity space,2
+13121011504,2001,Mostly forest / farmland,1
+13121011504,2019,Mostly forest / some developed open + low intensity space,2
+13121011505,2001,Mostly developed open + low intensity / some forest,3
+13121011505,2019,Mostly developed open + low intensity / some forest,3
+13121011506,2001,Mostly forest / some developed open + low intensity space,2
+13121011506,2019,Mostly developed open + low intensity / some forest,3
+13121011610,2001,"Mostly developed open + low intensity, some medium/high",6
+13121011610,2019,"Mostly developed open + low intensity, some medium/high",6
+13121011611,2001,Mostly developed space (all intensities) / some forest,4
+13121011611,2019,Mostly developed space (all intensities),7
+13121011612,2001,Mostly developed open + low intensity / some forest,3
+13121011612,2019,Mostly developed open + low intensity / some forest,3
+13121011613,2001,Mostly forest / some developed open + low intensity space,2
+13121011613,2019,Mostly developed open + low intensity / some forest,3
+13121011614,2001,Mostly developed space (all intensities) / some forest,4
+13121011614,2019,Mostly developed space (all intensities),7
+13121011615,2001,Mostly forest / some developed open + low intensity space,2
+13121011615,2019,Mostly forest / some developed open + low intensity space,2
+13121011616,2001,Mostly developed space (all intensities) / some forest,4
+13121011616,2019,Mostly developed space (all intensities),7
+13121011617,2001,Mostly developed open + low intensity / some forest,3
+13121011617,2019,"Mostly developed open + low intensity, some medium/high",6
+13121011618,2001,Mostly developed space (all intensities) / some forest,4
+13121011618,2019,Mostly developed space (all intensities),7
+13121011619,2001,Mostly developed space (all intensities) / some forest,4
+13121011619,2019,Mostly developed space (all intensities),7
+13121011620,2001,Mostly developed open + low intensity / some forest,3
+13121011620,2019,"Mostly developed open + low intensity, some medium/high",6
+13121011621,2001,Mostly developed space (all intensities),7
+13121011621,2019,Mostly developed space (all intensities),7
+13121011622,2001,Mostly forest / some developed open + low intensity space,2
+13121011622,2019,Mostly developed space (all intensities) / some forest,4
+13121011623,2001,Mostly developed open + low intensity / some forest,3
+13121011623,2019,"Mostly developed open + low intensity, some medium/high",6
+13121011624,2001,"Mostly developed open + low intensity, some medium/high",6
+13121011624,2019,"Mostly developed open + low intensity, some medium/high",6
+13121011625,2001,Mostly developed open + low intensity / some forest,3
+13121011625,2019,Mostly developed space (all intensities),7
+13121011626,2001,Mostly developed open + low intensity / some forest,3
+13121011626,2019,"Mostly developed open + low intensity, some medium/high",6
+13121011800,2001,Mostly medium to high intensity developed space,8
+13121011800,2019,Mostly medium to high intensity developed space,8
+13121011900,2001,Mostly medium to high intensity developed space,8
+13121011900,2019,Mostly medium to high intensity developed space,8
+13121012000,2001,Mostly medium to high intensity developed space,8
+13121012000,2019,Mostly medium to high intensity developed space,8
+13121012300,2001,Mostly medium to high intensity developed space,8
+13121012300,2019,Mostly medium to high intensity developed space,8
+13121980000,2001,Mostly medium to high intensity developed space,8
+13121980000,2019,Mostly medium to high intensity developed space,8
+13135050103,2001,Mostly forest / farmland,1
+13135050103,2019,Mostly forest / some developed open + low intensity space,2
+13135050105,2001,Mostly forest / some developed open + low intensity space,2
+13135050105,2019,Mostly developed space (all intensities) / some forest,4
+13135050106,2001,Mostly forest / farmland,1
+13135050106,2019,Mostly developed space (all intensities) / some forest,4
+13135050107,2001,Mostly forest / farmland,1
+13135050107,2019,Mostly forest / some developed open + low intensity space,2
+13135050108,2001,Mostly forest / farmland,1
+13135050108,2019,Mostly forest / some developed open + low intensity space,2
+13135050109,2001,Mostly forest / some developed open + low intensity space,2
+13135050109,2019,Mostly developed open + low intensity / some forest,3
+13135050205,2001,Mostly developed space (all intensities),7
+13135050205,2019,Mostly developed space (all intensities),7
+13135050208,2001,Mostly forest / farmland,1
+13135050208,2019,Mostly developed space (all intensities),7
+13135050209,2001,Mostly developed space (all intensities) / some forest,4
+13135050209,2019,Mostly developed space (all intensities),7
+13135050210,2001,Mostly developed space (all intensities) / some forest,4
+13135050210,2019,Mostly developed space (all intensities) / some forest,4
+13135050211,2001,Mostly developed space (all intensities),7
+13135050211,2019,Mostly medium to high intensity developed space,8
+13135050212,2001,Mostly forest / some developed open + low intensity space,2
+13135050212,2019,Mostly developed open + low intensity / some forest,3
+13135050213,2001,Mostly developed space (all intensities) / some forest,4
+13135050213,2019,Mostly developed space (all intensities) / some forest,4
+13135050214,2001,Mostly developed open + low intensity / some forest,3
+13135050214,2019,Mostly developed space (all intensities) / some forest,4
+13135050215,2001,Mostly developed space (all intensities),7
+13135050215,2019,Mostly medium to high intensity developed space,8
+13135050216,2001,Mostly forest / some developed open + low intensity space,2
+13135050216,2019,Mostly developed space (all intensities) / some forest,4
+13135050217,2001,Mostly developed open + low intensity / some forest,3
+13135050217,2019,Mostly developed space (all intensities),7
+13135050218,2001,Mostly developed open + low intensity / some forest,3
+13135050218,2019,Mostly developed open + low intensity / some forest,3
+13135050219,2001,Mostly developed space (all intensities) / some forest,4
+13135050219,2019,Mostly developed space (all intensities),7
+13135050220,2001,Mostly developed space (all intensities),7
+13135050220,2019,Mostly developed space (all intensities),7
+13135050304,2001,Mostly developed space (all intensities),7
+13135050304,2019,Mostly medium to high intensity developed space,8
+13135050306,2001,Mostly medium to high intensity developed space,8
+13135050306,2019,Mostly medium to high intensity developed space,8
+13135050308,2001,Mostly developed open + low intensity / some forest,3
+13135050308,2019,Mostly developed space (all intensities),7
+13135050309,2001,Mostly developed space (all intensities),7
+13135050309,2019,Mostly developed space (all intensities),7
+13135050310,2001,Mostly developed space (all intensities),7
+13135050310,2019,Mostly medium to high intensity developed space,8
+13135050311,2001,Mostly developed space (all intensities),7
+13135050311,2019,Mostly developed space (all intensities),7
+13135050313,2001,Mostly developed open + low intensity / some forest,3
+13135050313,2019,Mostly developed space (all intensities),7
+13135050314,2001,Mostly developed open + low intensity / some forest,3
+13135050314,2019,"Mostly developed open + low intensity, some medium/high",6
+13135050315,2001,Mostly developed open + low intensity / some forest,3
+13135050315,2019,Mostly developed open + low intensity / some forest,3
+13135050317,2001,Mostly developed space (all intensities),7
+13135050317,2019,Mostly developed space (all intensities),7
+13135050318,2001,Mostly developed space (all intensities) / some forest,4
+13135050318,2019,Mostly developed space (all intensities) / some forest,4
+13135050319,2001,Mostly developed space (all intensities),7
+13135050319,2019,Mostly developed space (all intensities),7
+13135050320,2001,Mostly developed space (all intensities),7
+13135050320,2019,Mostly developed space (all intensities),7
+13135050321,2001,Mostly developed open + low intensity / some forest,3
+13135050321,2019,Mostly developed open + low intensity / some forest,3
+13135050322,2001,Mostly developed open + low intensity / some forest,3
+13135050322,2019,Mostly developed open + low intensity / some forest,3
+13135050410,2001,Mostly developed space (all intensities) / some forest,4
+13135050410,2019,Mostly developed space (all intensities),7
+13135050415,2001,Mostly forest / some developed open + low intensity space,2
+13135050415,2019,Mostly forest / some developed open + low intensity space,2
+13135050416,2001,Mostly forest / farmland,1
+13135050416,2019,Mostly forest / some developed open + low intensity space,2
+13135050417,2001,Mostly medium to high intensity developed space,8
+13135050417,2019,Mostly medium to high intensity developed space,8
+13135050418,2001,Mostly developed open + low intensity / some forest,3
+13135050418,2019,Mostly developed space (all intensities),7
+13135050419,2001,Mostly developed open + low intensity / some forest,3
+13135050419,2019,"Mostly developed open + low intensity, some medium/high",6
+13135050421,2001,Mostly developed space (all intensities),7
+13135050421,2019,Mostly developed space (all intensities),7
+13135050422,2001,"Mostly developed open + low intensity, some medium/high",6
+13135050422,2019,"Mostly developed open + low intensity, some medium/high",6
+13135050423,2001,Mostly developed space (all intensities),7
+13135050423,2019,Mostly developed space (all intensities),7
+13135050424,2001,Mostly developed space (all intensities),7
+13135050424,2019,Mostly developed space (all intensities),7
+13135050425,2001,Mostly developed open + low intensity / some forest,3
+13135050425,2019,Mostly developed open + low intensity / some forest,3
+13135050426,2001,Mostly developed open + low intensity / some forest,3
+13135050426,2019,Mostly developed open + low intensity / some forest,3
+13135050427,2001,Mostly developed open + low intensity / some forest,3
+13135050427,2019,Mostly developed open + low intensity / some forest,3
+13135050428,2001,Mostly developed open + low intensity / some forest,3
+13135050428,2019,Mostly developed open + low intensity / some forest,3
+13135050429,2001,Mostly forest / some developed open + low intensity space,2
+13135050429,2019,Mostly developed open + low intensity / some forest,3
+13135050430,2001,Mostly developed open + low intensity / some forest,3
+13135050430,2019,Mostly developed open + low intensity / some forest,3
+13135050431,2001,Mostly forest / some developed open + low intensity space,2
+13135050431,2019,Mostly developed space (all intensities) / some forest,4
+13135050432,2001,Mostly developed open + low intensity / some forest,3
+13135050432,2019,Mostly developed open + low intensity / some forest,3
+13135050433,2001,"Mostly developed open + low intensity, some medium/high",6
+13135050433,2019,"Mostly developed open + low intensity, some medium/high",6
+13135050434,2001,Mostly developed space (all intensities),7
+13135050434,2019,Mostly developed space (all intensities),7
+13135050435,2001,Mostly developed space (all intensities),7
+13135050435,2019,Mostly developed space (all intensities),7
+13135050436,2001,Mostly developed space (all intensities),7
+13135050436,2019,Mostly developed space (all intensities),7
+13135050511,2001,Mostly developed space (all intensities) / some forest,4
+13135050511,2019,Mostly developed space (all intensities),7
+13135050520,2001,Mostly developed space (all intensities),7
+13135050520,2019,Mostly developed space (all intensities),7
+13135050521,2001,Mostly developed open + low intensity / some forest,3
+13135050521,2019,Mostly developed space (all intensities),7
+13135050522,2001,Mostly developed open + low intensity / some forest,3
+13135050522,2019,Mostly developed open + low intensity / some forest,3
+13135050523,2001,Mostly developed space (all intensities) / some forest,4
+13135050523,2019,Mostly developed space (all intensities) / some forest,4
+13135050524,2001,Mostly developed open + low intensity / some forest,3
+13135050524,2019,"Mostly developed open + low intensity, some medium/high",6
+13135050525,2001,Mostly developed space (all intensities) / some forest,4
+13135050525,2019,Mostly developed space (all intensities),7
+13135050526,2001,Mostly developed space (all intensities) / some forest,4
+13135050526,2019,Mostly developed space (all intensities),7
+13135050527,2001,Mostly developed open + low intensity / some forest,3
+13135050527,2019,Mostly developed open + low intensity / some forest,3
+13135050528,2001,Mostly developed open + low intensity / some forest,3
+13135050528,2019,Mostly developed open + low intensity / some forest,3
+13135050529,2001,Mostly developed space (all intensities),7
+13135050529,2019,Mostly developed space (all intensities),7
+13135050530,2001,Mostly developed open + low intensity / some forest,3
+13135050530,2019,"Mostly developed open + low intensity, some medium/high",6
+13135050531,2001,Mostly forest / some developed open + low intensity space,2
+13135050531,2019,Mostly developed open + low intensity / some forest,3
+13135050532,2001,Mostly developed open + low intensity / some forest,3
+13135050532,2019,Mostly developed open + low intensity / some forest,3
+13135050533,2001,Mostly developed open + low intensity / some forest,3
+13135050533,2019,Mostly developed space (all intensities),7
+13135050534,2001,Mostly developed open + low intensity / some forest,3
+13135050534,2019,"Mostly developed open + low intensity, some medium/high",6
+13135050535,2001,Mostly forest / some developed open + low intensity space,2
+13135050535,2019,Mostly developed open + low intensity / some forest,3
+13135050536,2001,Mostly developed space (all intensities) / some forest,4
+13135050536,2019,Mostly developed space (all intensities),7
+13135050537,2001,Mostly developed space (all intensities),7
+13135050537,2019,Mostly developed space (all intensities),7
+13135050538,2001,Mostly developed space (all intensities),7
+13135050538,2019,"Mostly developed open + low intensity, some medium/high",6
+13135050539,2001,"Mostly developed open + low intensity, some medium/high",6
+13135050539,2019,"Mostly developed open + low intensity, some medium/high",6
+13135050540,2001,Mostly developed space (all intensities),7
+13135050540,2019,Mostly developed space (all intensities),7
+13135050541,2001,"Mostly developed open + low intensity, little medium/high",5
+13135050541,2019,"Mostly developed open + low intensity, little medium/high",5
+13135050542,2001,Mostly medium to high intensity developed space,8
+13135050542,2019,Mostly medium to high intensity developed space,8
+13135050543,2001,Mostly forest / some developed open + low intensity space,2
+13135050543,2019,Mostly developed space (all intensities),7
+13135050544,2001,Mostly forest / some developed open + low intensity space,2
+13135050544,2019,Mostly developed open + low intensity / some forest,3
+13135050545,2001,Mostly forest / some developed open + low intensity space,2
+13135050545,2019,Mostly developed space (all intensities),7
+13135050546,2001,Mostly forest / farmland,1
+13135050546,2019,Mostly developed open + low intensity / some forest,3
+13135050547,2001,Mostly forest / some developed open + low intensity space,2
+13135050547,2019,Mostly forest / some developed open + low intensity space,2
+13135050548,2001,Mostly developed space (all intensities) / some forest,4
+13135050548,2019,Mostly developed space (all intensities),7
+13135050549,2001,Mostly developed open + low intensity / some forest,3
+13135050549,2019,Mostly developed open + low intensity / some forest,3
+13135050605,2001,Mostly forest / farmland,1
+13135050605,2019,Mostly forest / some developed open + low intensity space,2
+13135050606,2001,Mostly forest / farmland,1
+13135050606,2019,Mostly forest / some developed open + low intensity space,2
+13135050607,2001,Mostly forest / farmland,1
+13135050607,2019,Mostly developed space (all intensities) / some forest,4
+13135050608,2001,Mostly forest / farmland,1
+13135050608,2019,Mostly forest / farmland,1
+13135050609,2001,Mostly forest / farmland,1
+13135050609,2019,Mostly forest / some developed open + low intensity space,2
+13135050610,2001,Mostly forest / farmland,1
+13135050610,2019,Mostly forest / some developed open + low intensity space,2
+13135050709,2001,Mostly forest / farmland,1
+13135050709,2019,Mostly forest / some developed open + low intensity space,2
+13135050712,2001,Mostly forest / some developed open + low intensity space,2
+13135050712,2019,Mostly developed open + low intensity / some forest,3
+13135050713,2001,"Mostly developed open + low intensity, little medium/high",5
+13135050713,2019,"Mostly developed open + low intensity, some medium/high",6
+13135050714,2001,Mostly forest / some developed open + low intensity space,2
+13135050714,2019,Mostly forest / some developed open + low intensity space,2
+13135050715,2001,Mostly forest / some developed open + low intensity space,2
+13135050715,2019,Mostly developed open + low intensity / some forest,3
+13135050718,2001,Mostly developed open + low intensity / some forest,3
+13135050718,2019,Mostly developed open + low intensity / some forest,3
+13135050719,2001,Mostly forest / some developed open + low intensity space,2
+13135050719,2019,Mostly developed open + low intensity / some forest,3
+13135050720,2001,Mostly developed open + low intensity / some forest,3
+13135050720,2019,Mostly developed open + low intensity / some forest,3
+13135050721,2001,Mostly forest / some developed open + low intensity space,2
+13135050721,2019,Mostly developed open + low intensity / some forest,3
+13135050722,2001,Mostly developed open + low intensity / some forest,3
+13135050722,2019,"Mostly developed open + low intensity, little medium/high",5
+13135050723,2001,Mostly forest / some developed open + low intensity space,2
+13135050723,2019,Mostly developed open + low intensity / some forest,3
+13135050724,2001,Mostly forest / farmland,1
+13135050724,2019,Mostly developed open + low intensity / some forest,3
+13135050725,2001,Mostly developed open + low intensity / some forest,3
+13135050725,2019,"Mostly developed open + low intensity, little medium/high",5
+13135050726,2001,Mostly forest / farmland,1
+13135050726,2019,Mostly forest / some developed open + low intensity space,2
+13135050727,2001,Mostly forest / farmland,1
+13135050727,2019,Mostly forest / some developed open + low intensity space,2
+13135050728,2001,Mostly forest / farmland,1
+13135050728,2019,Mostly forest / some developed open + low intensity space,2
+13135050729,2001,Mostly developed open + low intensity / some forest,3
+13135050729,2019,"Mostly developed open + low intensity, some medium/high",6
+13135050730,2001,Mostly forest / some developed open + low intensity space,2
+13135050730,2019,Mostly developed open + low intensity / some forest,3
+13135050731,2001,Mostly forest / farmland,1
+13135050731,2019,Mostly developed space (all intensities) / some forest,4
+13151070104,2001,Mostly forest / some developed open + low intensity space,2
+13151070104,2019,Mostly forest / some developed open + low intensity space,2
+13151070106,2001,Mostly forest / farmland,1
+13151070106,2019,Mostly forest / some developed open + low intensity space,2
+13151070107,2001,Mostly forest / farmland,1
+13151070107,2019,Mostly forest / farmland,1
+13151070108,2001,Mostly forest / farmland,1
+13151070108,2019,Mostly forest / some developed open + low intensity space,2
+13151070109,2001,Mostly forest / farmland,1
+13151070109,2019,Mostly forest / farmland,1
+13151070110,2001,Mostly forest / farmland,1
+13151070110,2019,Mostly forest / farmland,1
+13151070111,2001,Mostly developed space (all intensities) / some forest,4
+13151070111,2019,Mostly developed space (all intensities) / some forest,4
+13151070113,2001,Mostly forest / some developed open + low intensity space,2
+13151070113,2019,Mostly forest / some developed open + low intensity space,2
+13151070114,2001,Mostly developed space (all intensities) / some forest,4
+13151070114,2019,Mostly developed space (all intensities) / some forest,4
+13151070202,2001,Mostly forest / farmland,1
+13151070202,2019,Mostly forest / farmland,1
+13151070203,2001,Mostly forest / farmland,1
+13151070203,2019,Mostly forest / farmland,1
+13151070204,2001,Mostly forest / farmland,1
+13151070204,2019,Mostly forest / farmland,1
+13151070205,2001,Mostly forest / farmland,1
+13151070205,2019,Mostly forest / farmland,1
+13151070304,2001,Mostly forest / farmland,1
+13151070304,2019,Mostly developed space (all intensities) / some forest,4
+13151070305,2001,Mostly forest / farmland,1
+13151070305,2019,Mostly forest / farmland,1
+13151070306,2001,Mostly forest / farmland,1
+13151070306,2019,Mostly forest / farmland,1
+13151070307,2001,Mostly forest / farmland,1
+13151070307,2019,Mostly forest / some developed open + low intensity space,2
+13151070309,2001,Mostly forest / some developed open + low intensity space,2
+13151070309,2019,Mostly developed open + low intensity / some forest,3
+13151070310,2001,Mostly forest / farmland,1
+13151070310,2019,Mostly forest / some developed open + low intensity space,2
+13151070311,2001,Mostly forest / some developed open + low intensity space,2
+13151070311,2019,Mostly developed space (all intensities) / some forest,4
+13151070402,2001,Mostly forest / farmland,1
+13151070402,2019,Mostly forest / farmland,1
+13151070403,2001,Mostly forest / farmland,1
+13151070403,2019,Mostly forest / farmland,1
+13151070404,2001,Mostly forest / farmland,1
+13151070404,2019,Mostly forest / farmland,1
+13151070501,2001,Mostly forest / farmland,1
+13151070501,2019,Mostly forest / farmland,1
+13151070502,2001,Mostly forest / farmland,1
+13151070502,2019,Mostly forest / farmland,1
+13247060101,2001,Mostly forest / farmland,1
+13247060101,2019,Mostly forest / farmland,1
+13247060102,2001,Mostly forest / farmland,1
+13247060102,2019,Mostly forest / farmland,1
+13247060201,2001,Mostly forest / farmland,1
+13247060201,2019,Mostly forest / farmland,1
+13247060202,2001,Mostly forest / farmland,1
+13247060202,2019,Mostly forest / farmland,1
+13247060304,2001,Mostly developed space (all intensities) / some forest,4
+13247060304,2019,Mostly developed space (all intensities) / some forest,4
+13247060305,2001,Mostly forest / some developed open + low intensity space,2
+13247060305,2019,Mostly developed space (all intensities) / some forest,4
+13247060306,2001,Mostly forest / farmland,1
+13247060306,2019,Mostly forest / some developed open + low intensity space,2
+13247060307,2001,Mostly developed open + low intensity / some forest,3
+13247060307,2019,Mostly developed open + low intensity / some forest,3
+13247060308,2001,Mostly forest / farmland,1
+13247060308,2019,Mostly developed space (all intensities) / some forest,4
+13247060309,2001,Mostly forest / some developed open + low intensity space,2
+13247060309,2019,Mostly forest / some developed open + low intensity space,2
+13247060403,2001,Mostly forest / farmland,1
+13247060403,2019,Mostly forest / farmland,1
+13247060404,2001,Mostly forest / farmland,1
+13247060404,2019,Mostly forest / farmland,1
+13247060405,2001,Mostly forest / farmland,1
+13247060405,2019,Mostly forest / farmland,1
+13247060406,2001,Mostly forest / some developed open + low intensity space,2
+13247060406,2019,Mostly forest / some developed open + low intensity space,2
+13247060407,2001,Mostly forest / some developed open + low intensity space,2
+13247060407,2019,Mostly forest / some developed open + low intensity space,2
